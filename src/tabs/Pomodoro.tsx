@@ -19,14 +19,18 @@ function format(total: number) {
   return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
 }
 
+function todayStr() {
+  return new Date().toISOString().slice(0, 10);
+}
+
 export function PomodoroTab() {
   const [phase, setPhase] = useState<Phase>("focus");
   const [remaining, setRemaining] = useState(FOCUS_SECONDS);
   const [running, setRunning] = useState(false);
-  const [completedCycles, setCompletedCycles] = useState(0);
-  const [focusCount, setFocusCount] = useState(0);
-  const sessions = useAppStore((s) => s.pomodoroSessions);
+  const [completedInSession, setCompletedInSession] = useState(0);
+
   const addPomodoroSession = useAppStore((s) => s.addPomodoroSession);
+  const sessions = useAppStore((s) => s.pomodoroSessions);
 
   const total = phase === "focus" ? FOCUS_SECONDS : phase === "short" ? SHORT_BREAK : LONG_BREAK;
 
@@ -36,22 +40,15 @@ export function PomodoroTab() {
       haptic("success");
 
       if (phase === "focus") {
-        const newFocusCount = focusCount + 1;
-        setFocusCount(newFocusCount);
-        if (newFocusCount % 4 === 0) {
+        addPomodoroSession({ date: todayStr(), completedCycles: 1, totalFocusSeconds: FOCUS_SECONDS });
+        setCompletedInSession((c) => c + 1);
+        const nextCount = completedInSession + 1;
+        if (nextCount % 4 === 0) {
           setPhase("long");
           setRemaining(LONG_BREAK);
         } else {
           setPhase("short");
           setRemaining(SHORT_BREAK);
-        }
-        setCompletedCycles((c) => c + 1);
-        const today = new Date().toISOString().slice(0, 10);
-        const existing = sessions.find((s) => s.date === today);
-        if (existing) {
-          // day already recorded; we keep simple aggregate
-        } else {
-          addPomodoroSession({ date: today, completedCycles: completedCycles + 1, totalFocusSeconds: FOCUS_SECONDS });
         }
       } else {
         setPhase("focus");
@@ -59,7 +56,7 @@ export function PomodoroTab() {
         setRunning(false);
       }
     }
-  }, [remaining, running, phase, focusCount, completedCycles, sessions, addPomodoroSession]);
+  }, [remaining, running, phase, completedInSession, addPomodoroSession]);
 
   useInterval(
     () => {
@@ -86,9 +83,16 @@ export function PomodoroTab() {
   const progress = (total - remaining) / total;
   const color = phase === "focus" ? "#6366f1" : phase === "short" ? "#22c55e" : "#a855f7";
 
-  const todayStr = new Date().toISOString().slice(0, 10);
-  const todaySession = sessions.filter((s) => s.date === todayStr);
-  const todayCycles = todaySession.reduce((sum, s) => sum + s.completedCycles, 0) || completedCycles;
+  const today = todayStr();
+  const todaySession = sessions.find((s) => s.date === today);
+  const todayCycles = todaySession ? todaySession.completedCycles : 0;
+  const totalCycles = sessions.reduce((sum, s) => sum + s.completedCycles, 0);
+
+  const phaseIcon = {
+    focus: <Brain className="mr-1 inline h-4 w-4" />,
+    short: <Coffee className="mr-1 inline h-4 w-4" />,
+    long: <Coffee className="mr-1 inline h-4 w-4" />,
+  };
 
   return (
     <div className="tab-content flex h-full flex-col items-center gap-5 overflow-y-auto p-5 pb-28">
@@ -97,7 +101,7 @@ export function PomodoroTab() {
           <button
             key={p}
             onClick={() => manualPhase(p)}
-            className={`rounded-full px-4 py-2 text-sm font-semibold capitalize transition ${
+            className={`flex items-center rounded-full px-4 py-2 text-sm font-semibold capitalize transition ${
               phase === p
                 ? p === "focus"
                   ? "bg-primary text-white"
@@ -107,9 +111,7 @@ export function PomodoroTab() {
                 : "text-text-secondary"
             }`}
           >
-            {p === "focus" && <Brain className="mr-1 inline h-4 w-4" />}
-            {p === "short" && <Coffee className="mr-1 inline h-4 w-4" />}
-            {p === "long" && <Coffee className="mr-1 inline h-4 w-4" />}
+            {phaseIcon[p]}
             {p}
           </button>
         ))}
@@ -142,16 +144,16 @@ export function PomodoroTab() {
 
       <div className="grid w-full max-w-sm grid-cols-2 gap-3">
         <div className="rounded-2xl bg-surface-2 p-4 text-center">
-          <p className="text-3xl font-bold text-primary">{completedCycles}</p>
-          <p className="text-xs text-text-secondary">Cycles this session</p>
+          <p className="text-3xl font-bold text-primary">{todayCycles}</p>
+          <p className="text-xs text-text-secondary">Today</p>
         </div>
         <div className="rounded-2xl bg-surface-2 p-4 text-center">
-          <p className="text-3xl font-bold text-success">{todayCycles}</p>
-          <p className="text-xs text-text-secondary">Today</p>
+          <p className="text-3xl font-bold text-success">{totalCycles}</p>
+          <p className="text-xs text-text-secondary">All time</p>
         </div>
       </div>
 
-      {completedCycles > 0 && completedCycles % 4 === 0 && (
+      {todayCycles > 0 && todayCycles % 4 === 0 && (
         <div className="flex items-center gap-2 rounded-2xl bg-success/10 p-3 text-success">
           <Trophy className="h-5 w-5" />
           <span className="font-medium">Great focus streak! Take a long break.</span>

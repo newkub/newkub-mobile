@@ -23,9 +23,7 @@ export async function initCapacitor() {
       if (isActive) SplashScreen.hide();
     });
 
-    CapApp.addListener("backButton", () => {
-      // handled via UI
-    });
+    // back button uses default Android behavior (exit app)
   } catch {
     // ignore on web / missing plugins
   }

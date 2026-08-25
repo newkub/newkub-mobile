@@ -9,6 +9,7 @@ pnpm-lock.yaml
 dist
 dist-ssr
 *.local
+tsconfig.tsbuildinfo
 
 # Capacitor (keep platform directories so repo is ready for build)
 # android/

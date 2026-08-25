@@ -21,7 +21,7 @@ export function TabBar() {
           <button
             key={id}
             onClick={() => setActiveTab(id)}
-            className={`flex flex-1 flex-col items-center justify-center gap-1 py-3 transition ${
+            className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 transition ${
               active ? "text-primary" : "text-text-secondary"
             }`}
           >

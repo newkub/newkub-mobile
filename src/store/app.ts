@@ -119,7 +119,23 @@ export const useAppStore = create<AppState>()(
 
       pomodoroSessions: [],
       addPomodoroSession: (session) =>
-        set((s) => ({ pomodoroSessions: [...s.pomodoroSessions, session] })),
+        set((s) => {
+          const existing = s.pomodoroSessions.find((x) => x.date === session.date);
+          if (existing) {
+            return {
+              pomodoroSessions: s.pomodoroSessions.map((x) =>
+                x.date === session.date
+                  ? {
+                    ...x,
+                    completedCycles: x.completedCycles + session.completedCycles,
+                    totalFocusSeconds: x.totalFocusSeconds + session.totalFocusSeconds,
+                  }
+                  : x
+              ),
+            };
+          }
+          return { pomodoroSessions: [...s.pomodoroSessions, session] };
+        }),
 
       elevenLabsKey: "",
       setElevenLabsKey: (key) => set({ elevenLabsKey: key }),

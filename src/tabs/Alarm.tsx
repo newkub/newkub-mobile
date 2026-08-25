@@ -64,11 +64,15 @@ export function AlarmTab() {
 }
 
 function CurrentAlarmCard() {
-  const now = new Date();
   const next = useAppStore((s) =>
     s.alarms
       .filter((a) => a.enabled)
-      .map((a) => new Date(now.setHours(a.hour, a.minute, 0, 0)))
+      .map((a) => {
+        const d = new Date();
+        d.setHours(a.hour, a.minute, 0, 0);
+        if (d < new Date()) d.setDate(d.getDate() + 1);
+        return d;
+      })
       .sort((d1, d2) => d1.getTime() - d2.getTime())[0]
   );
 
@@ -105,14 +109,14 @@ function AlarmItem({ alarm }: { alarm: Alarm }) {
       next.setHours(alarm.hour, alarm.minute, 0, 0);
       if (next < new Date()) next.setDate(next.getDate() + 1);
       await scheduleAlarm({
-        id: parseInt(alarm.id.replace(/\D/g, "").slice(0, 9) || "1"),
+        id: hashId(alarm.id),
         title: alarm.label || "Alarm",
         body: "Time to wake up!",
         schedule: { at: next },
       });
     } else {
       await haptic("light");
-      await cancelAlarm(parseInt(alarm.id.replace(/\D/g, "").slice(0, 9) || "1"));
+      await cancelAlarm(hashId(alarm.id));
     }
   }
 
@@ -264,6 +268,12 @@ function AiSoundEditor({
       )}
     </div>
   );
+}
+
+function hashId(id: string): number {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h << 5) - h + id.charCodeAt(i);
+  return Math.abs(h) % 2147483647;
 }
 
 function AddAlarmModal({

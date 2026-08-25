@@ -1,4 +1,3 @@
-import { Bell, Plus } from "lucide-react";
 import { useAppStore } from "../store/app";
 
 export function Header() {
@@ -20,14 +19,6 @@ export function Header() {
         <p className="text-sm text-text-secondary">
           {now.toLocaleDateString("th-TH", { weekday: "long", day: "numeric", month: "long" })}
         </p>
-      </div>
-      <div className="flex gap-2">
-        <button className="rounded-full bg-surface-2 p-3 text-text-secondary hover:text-text">
-          <Bell className="h-5 w-5" />
-        </button>
-        <button className="rounded-full bg-primary p-3 text-white hover:bg-primary-glow">
-          <Plus className="h-5 w-5" />
-        </button>
       </div>
     </header>
   );

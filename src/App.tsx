@@ -27,10 +27,10 @@ export default function App() {
 
   return (
     <div className="relative flex h-screen w-screen flex-col bg-bg">
-      <div className="fixed right-4 top-safe z-50 pt-4">
+      <div className="fixed right-4 top-0 z-50 pt-safe">
         <button
           onClick={() => { setSettingsOpen(true); haptic("light"); }}
-          className="rounded-full bg-surface-2 p-2.5 text-text-secondary hover:text-text"
+          className="mt-4 rounded-full bg-surface-2 p-2.5 text-text-secondary hover:text-text"
         >
           <Settings className="h-5 w-5" />
         </button>
