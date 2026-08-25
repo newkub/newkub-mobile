@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^8.5.0",
+    "@cloudflare/workers-types": "^5.20260825.1",
     "@tailwindcss/vite": "^4.3.3",
     "@testing-library/react": "^16.3.2",
     "@types/react": "^19.2.18",

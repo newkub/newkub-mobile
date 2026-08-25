@@ -11,6 +11,8 @@ import { Button } from "./components/Button";
 import { Input } from "./components/Input";
 import { X, Settings } from "lucide-react";
 import { haptic } from "./lib/capacitor";
+import { OnboardingModal } from "./components/OnboardingModal";
+import { LockScreen } from "./components/LockScreen";
 
 const tabs = {
   alarm: AlarmTab,
@@ -23,6 +25,7 @@ const tabs = {
 export default function App() {
   const activeTab = useAppStore((s) => s.activeTab);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [unlocked, setUnlocked] = useState(false);
   const Tab = tabs[activeTab];
 
   return (
@@ -30,7 +33,7 @@ export default function App() {
       <div className="fixed right-4 top-0 z-50 pt-safe">
         <button
           onClick={() => { setSettingsOpen(true); haptic("light"); }}
-          className="mt-4 rounded-full bg-surface-2 p-2.5 text-text-secondary hover:text-text"
+          className="mt-4 rounded-full bg-surface-2 p-2.5 text-text-secondary transition hover:text-text"
         >
           <Settings className="h-5 w-5" />
         </button>
@@ -41,6 +44,8 @@ export default function App() {
       </main>
       <TabBar />
       {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
+      <OnboardingModal />
+      {!unlocked && <LockScreen onUnlock={() => setUnlocked(true)} />}
     </div>
   );
 }

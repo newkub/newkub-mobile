@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { deleteAlarm, deleteReminder, pushAlarm, pushReminder } from "../lib/sync";
 
 export type Day = "MO" | "TU" | "WE" | "TH" | "FR" | "SA" | "SU";
 
@@ -42,6 +43,9 @@ export interface AppState {
   activeTab: "alarm" | "stopwatch" | "timer" | "pomodoro" | "reminder";
   setActiveTab: (tab: AppState["activeTab"]) => void;
 
+  userId: string;
+  setUserId: (id: string) => void;
+
   alarms: Alarm[];
   addAlarm: (alarm: Alarm) => void;
   updateAlarm: (id: string, patch: Partial<Alarm>) => void;
@@ -82,19 +86,34 @@ export const useAppStore = create<AppState>()(
       activeTab: "alarm",
       setActiveTab: (tab) => set({ activeTab: tab }),
 
+      userId: "",
+      setUserId: (id) => set({ userId: id }),
+
       alarms: [],
-      addAlarm: (alarm) => set((s) => ({ alarms: [...s.alarms, alarm] })),
+      addAlarm: (alarm) =>
+        set((s) => {
+          if (s.userId) pushAlarm(s.userId, alarm).catch(() => null);
+          return { alarms: [...s.alarms, alarm] };
+        }),
       updateAlarm: (id, patch) =>
-        set((s) => ({
-          alarms: s.alarms.map((a) => (a.id === id ? { ...a, ...patch } : a)),
-        })),
-      removeAlarm: (id) => set((s) => ({ alarms: s.alarms.filter((a) => a.id !== id) })),
+        set((s) => {
+          const next = s.alarms.map((a) => (a.id === id ? { ...a, ...patch } : a));
+          const updated = next.find((a) => a.id === id);
+          if (updated && s.userId) pushAlarm(s.userId, updated).catch(() => null);
+          return { alarms: next };
+        }),
+      removeAlarm: (id) =>
+        set((s) => {
+          if (s.userId) deleteAlarm(s.userId, id).catch(() => null);
+          return { alarms: s.alarms.filter((a) => a.id !== id) };
+        }),
       toggleAlarm: (id) =>
-        set((s) => ({
-          alarms: s.alarms.map((a) =>
-            a.id === id ? { ...a, enabled: !a.enabled } : a
-          ),
-        })),
+        set((s) => {
+          const next = s.alarms.map((a) => (a.id === id ? { ...a, enabled: !a.enabled } : a));
+          const updated = next.find((a) => a.id === id);
+          if (updated && s.userId) pushAlarm(s.userId, updated).catch(() => null);
+          return { alarms: next };
+        }),
 
       timerPresets: defaultPresets,
       addTimerPreset: (preset) =>
@@ -103,19 +122,30 @@ export const useAppStore = create<AppState>()(
         set((s) => ({ timerPresets: s.timerPresets.filter((p) => p.id !== id) })),
 
       reminders: [],
-      addReminder: (r) => set((s) => ({ reminders: [...s.reminders, r] })),
+      addReminder: (r) =>
+        set((s) => {
+          if (s.userId) pushReminder(s.userId, r).catch(() => null);
+          return { reminders: [...s.reminders, r] };
+        }),
       updateReminder: (id, patch) =>
-        set((s) => ({
-          reminders: s.reminders.map((r) => (r.id === id ? { ...r, ...patch } : r)),
-        })),
+        set((s) => {
+          const next = s.reminders.map((r) => (r.id === id ? { ...r, ...patch } : r));
+          const updated = next.find((r) => r.id === id);
+          if (updated && s.userId) pushReminder(s.userId, updated).catch(() => null);
+          return { reminders: next };
+        }),
       removeReminder: (id) =>
-        set((s) => ({ reminders: s.reminders.filter((r) => r.id !== id) })),
+        set((s) => {
+          if (s.userId) deleteReminder(s.userId, id).catch(() => null);
+          return { reminders: s.reminders.filter((r) => r.id !== id) };
+        }),
       toggleReminder: (id) =>
-        set((s) => ({
-          reminders: s.reminders.map((r) =>
-            r.id === id ? { ...r, enabled: !r.enabled } : r
-          ),
-        })),
+        set((s) => {
+          const next = s.reminders.map((r) => (r.id === id ? { ...r, enabled: !r.enabled } : r));
+          const updated = next.find((r) => r.id === id);
+          if (updated && s.userId) pushReminder(s.userId, updated).catch(() => null);
+          return { reminders: next };
+        }),
 
       pomodoroSessions: [],
       addPomodoroSession: (session) =>

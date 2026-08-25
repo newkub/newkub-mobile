@@ -1,5 +1,6 @@
 import { AlarmClock, Timer, Hourglass, Briefcase, ClipboardList } from "lucide-react";
 import { useAppStore } from "../store/app";
+import { haptic } from "../lib/capacitor";
 
 const tabs = [
   { id: "alarm" as const, label: "Alarm", Icon: AlarmClock },
@@ -20,15 +21,18 @@ export function TabBar() {
         return (
           <button
             key={id}
-            onClick={() => setActiveTab(id)}
-            className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 transition ${
+            onClick={() => {
+              haptic("light");
+              setActiveTab(id);
+            }}
+            className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 transition active:scale-95 ${
               active ? "text-primary" : "text-text-secondary"
             }`}
           >
-            <Icon className="h-6 w-6" strokeWidth={active ? 2.5 : 2} />
+            <Icon className="h-6 w-6 transition-transform duration-200" strokeWidth={active ? 2.5 : 2} />
             <span className="text-[10px] font-medium">{label}</span>
             {active && (
-              <span className="absolute bottom-1 h-1 w-8 rounded-full bg-primary" />
+              <span className="absolute bottom-1 h-1 w-8 rounded-full bg-primary transition-all duration-200" />
             )}
           </button>
         );
