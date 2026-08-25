@@ -12,6 +12,7 @@ Lock-screen style clock app for Android and PWA. Built with React 19, Vite 8, Ta
 - **Pomodoro** — focus / short break / long break, cycles, today's stats
 - **Reminder** — schedule months ahead, recurring daily/weekly/monthly
 - **Cloud Sync** — alarms and reminders sync across devices via Cloudflare Pages Functions and D1
+- **Home Screen Widget** — Android clock widget
 
 ## Tech Stack
 
@@ -96,6 +97,14 @@ Copy the printed `database_id` into `wrangler.toml` if it differs.
 ├── schema.sql            # D1 schema
 └── wrangler.toml         # Cloudflare Pages + D1 config
 ```
+
+## Android Widget
+
+A home screen clock widget is included in the Android app. Long-press on the home screen, select `new-habbit Clock`, and place the widget.
+
+## Play Store
+
+See `RELEASING.md` for building the release AAB and uploading to Google Play.
 
 ## Sync Model
 
