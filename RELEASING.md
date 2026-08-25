@@ -34,14 +34,27 @@ For Play Store, use the upload keystore. Google Play will manage the final app s
 
 ### Automated (GitHub Actions)
 
-1. Generate a Google Play service account JSON with `Release Manager` role.
-2. Add GitHub secrets:
-   - `PLAY_STORE_SERVICE_ACCOUNT_JSON`
+1. Create a Google Play service account:
+   - Open https://play.google.com/console
+   - Go to `Setup > API access`
+   - Link a Google Cloud project if not already done
+   - Click `Create service account` and follow the steps
+   - Grant the service account `Release Manager` role
+   - Download the JSON key
+2. Add GitHub secrets in `newkub/new-habbit`:
+   - `PLAY_STORE_SERVICE_ACCOUNT_JSON` — paste the full JSON key
    - `SIGNING_KEYSTORE_BASE64` — base64 of `new-habbit-upload.keystore`
    - `SIGNING_STORE_PASSWORD`
    - `SIGNING_KEY_PASSWORD`
    - `SIGNING_KEY_ALIAS` (`new-habbit`)
 3. Trigger workflow: `.github/workflows/playstore.yml`
+
+To get base64 of the keystore:
+
+```bash
+cd android/app
+base64 -w 0 new-habbit-upload.keystore
+```
 
 ## Widget
 
