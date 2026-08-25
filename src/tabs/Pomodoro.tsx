@@ -5,6 +5,7 @@ import { Button } from "../components/Button";
 import { useInterval } from "../hooks/use-interval";
 import { haptic } from "../lib/capacitor";
 import { playBeep } from "../lib/audio";
+import { formatDuration } from "../lib/time";
 import { useAppStore } from "../store/app";
 
 const FOCUS_SECONDS = 25 * 60;
@@ -14,9 +15,7 @@ const LONG_BREAK = 15 * 60;
 type Phase = "focus" | "short" | "long";
 
 function format(total: number) {
-  const m = Math.floor(total / 60);
-  const s = total % 60;
-  return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  return formatDuration(total);
 }
 
 function todayStr() {

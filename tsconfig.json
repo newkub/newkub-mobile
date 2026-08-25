@@ -2,7 +2,11 @@
   "compilerOptions": {
     "target": "ES2022",
     "useDefineForClassFields": true,
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "module": "ESNext",
     "skipLibCheck": true,
     "moduleResolution": "bundler",
@@ -16,7 +20,17 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-    "types": ["@capacitor/core"]
+    "types": [
+      "@capacitor/core"
+    ]
   },
-  "include": ["src", "capacitor.config.ts"]
+  "include": [
+    "src",
+    "capacitor.config.ts"
+  ],
+  "exclude": [
+    "src/__tests__",
+    "src/**/*.test.ts",
+    "vitest.setup.ts"
+  ]
 }

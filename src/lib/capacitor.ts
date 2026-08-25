@@ -8,10 +8,6 @@ export function isNative(): boolean {
   return Capacitor.isNativePlatform();
 }
 
-export function isAndroid(): boolean {
-  return Capacitor.getPlatform() === "android";
-}
-
 export async function initCapacitor() {
   if (!isNative()) return;
   try {

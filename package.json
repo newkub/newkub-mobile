@@ -16,6 +16,8 @@
     "cap:open": "cap open android",
     "cap:run": "cap run android",
     "cap:add:android": "cap add android",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "deploy": "wrangler pages deploy dist"
   },
   "dependencies": {
@@ -35,12 +37,15 @@
   "devDependencies": {
     "@capacitor/cli": "^8.5.0",
     "@tailwindcss/vite": "^4.3.3",
+    "@testing-library/react": "^16.3.2",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
     "@vitejs/plugin-react": "^6.1.0",
+    "jsdom": "^30.0.1",
     "tailwindcss": "^4.3.3",
     "typescript": "^5.7.3",
     "vite": "^8.2.2",
+    "vitest": "^4.1.11",
     "wrangler": "^4.0.0"
   }
 }

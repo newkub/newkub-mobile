@@ -9,14 +9,15 @@ Ship `new-habbit` ให้ทำงานบน Android (Capacitor 8) และ
 
 ## Scope
 
-- Web app: React 19 + Vite 8 + TypeScript 7 + Tailwind CSS v4
+- Web app: React 19 + Vite 8 + TypeScript 5 + Tailwind CSS v4
 - Mobile wrapper: Capacitor 8 (Android only)
 - Storage: Capacitor Preferences + Zustand persist
 - Notifications: Capacitor Local Notifications
 - AI sound: ElevenLabs API (TTS)
 - Deploy: Cloudflare Pages
+- Review: /review-codebase
 
-## Commands
+## Execute
 
 ```bash
 # dev
@@ -40,6 +41,16 @@ bun cap:open
 # deploy to Cloudflare Pages
 bun deploy
 ```
+
+## Rules
+
+- ใช้ React hooks และ Zustand สำหรับ state
+- ห้าม hardcode secrets ใน source
+- TypeScript strict mode
+- ทุก async external call (Capacitor, ElevenLabs) ต้องมี try/catch
+- ทุก component/tab ควรยาวไม่เกิน 250 บรรทัด
+- PWA manifest และ service worker ต้องครบถ้วน
+- Android project ใช้ `server.cleartext` disabled สำหรับ production
 
 ## Architecture
 

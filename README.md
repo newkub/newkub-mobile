@@ -48,6 +48,32 @@ bun run build
 bun run deploy
 ```
 
-## Environment
+## Architecture
 
-No required env vars. For AI voice in alarms, enter your ElevenLabs API key in the in-app Settings.
+- `src/main.tsx` — entry, init Capacitor plugins
+- `src/App.tsx` — tab router + settings modal
+- `src/components/` — reusable UI
+- `src/tabs/` — 5 screens
+- `src/lib/` — Capacitor wrapper, storage, audio, ElevenLabs, notifications
+- `src/store/app.ts` — Zustand state
+
+## Project Structure
+
+```
+.
+├── android/              # Capacitor Android project
+├── public/               # PWA manifest, service worker, icons
+├── src/
+│   ├── components/
+│   ├── tabs/
+│   ├── lib/
+│   ├── store/
+│   └── __tests__/
+├── .github/workflows/    # CI, PR, deploy
+└── wrangler.toml         # Cloudflare Pages config
+```
+
+## License
+
+MIT — see `LICENSE`.
+

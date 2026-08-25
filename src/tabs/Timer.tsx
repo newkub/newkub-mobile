@@ -5,15 +5,12 @@ import { Button } from "../components/Button";
 import { useInterval } from "../hooks/use-interval";
 import { haptic } from "../lib/capacitor";
 import { playBeep } from "../lib/audio";
+import { formatDuration } from "../lib/time";
 import { useAppStore, type TimerPreset } from "../store/app";
 import { Input } from "../components/Input";
 
 function format(total: number) {
-  const h = Math.floor(total / 3600);
-  const m = Math.floor((total % 3600) / 60);
-  const s = total % 60;
-  if (h > 0) return `${h}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
-  return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  return formatDuration(total);
 }
 
 export function TimerTab() {

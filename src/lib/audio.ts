@@ -2,7 +2,7 @@ let audioCtx: AudioContext | null = null;
 
 function ensureCtx(): AudioContext {
   if (!audioCtx) {
-    audioCtx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+    audioCtx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext; }).webkitAudioContext)();
   }
   return audioCtx;
 }
@@ -39,6 +39,3 @@ export function stopAudio(audio?: HTMLAudioElement | null) {
   }
 }
 
-export function resumeAudioContext() {
-  ensureCtx().resume().catch(() => null);
-}

@@ -10,6 +10,7 @@ dist
 dist-ssr
 *.local
 tsconfig.tsbuildinfo
+review-result.json
 
 # Capacitor (keep platform directories so repo is ready for build)
 # android/

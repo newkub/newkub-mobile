@@ -5,7 +5,7 @@ export interface AlarmNotification {
   id: number;
   title: string;
   body: string;
-  schedule: { at?: Date; every?: "day" | "week" | "month" | "year" | { hour: number; minute: number } };
+  schedule: { at?: Date; every?: "day" | "week" | "month" | "year" | { hour: number; minute: number; }; };
 }
 
 export async function requestNotificationPermission(): Promise<boolean> {
@@ -47,7 +47,18 @@ export async function cancelAlarm(id: number) {
   await LocalNotifications.cancel({ notifications: [{ id }] });
 }
 
-export async function getPendingAlarms(): Promise<{ id: number; schedule?: Date }[]> {
+export async function scheduleReminder(alarm: AlarmNotification) {
+  if (!isNative()) return alarm.id;
+  await scheduleAlarm(alarm);
+  return alarm.id;
+}
+
+export async function cancelNotification(id: number) {
+  if (!isNative()) return;
+  await cancelAlarm(id);
+}
+
+export async function getPendingAlarms(): Promise<{ id: number; schedule?: Date; }[]> {
   if (!isNative()) return [];
   const { notifications } = await LocalNotifications.getPending();
   return notifications.map((n) => ({

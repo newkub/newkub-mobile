@@ -19,6 +19,7 @@ import { generateSound } from "../lib/elevenlabs";
 import { playAlarmPreview, stopAudio } from "../lib/audio";
 import { haptic } from "../lib/capacitor";
 import { scheduleAlarm, cancelAlarm } from "../lib/notifications";
+import { hashId } from "../lib/hash";
 
 const DAYS: Day[] = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"];
 const DAY_LABELS: Record<Day, string> = {
@@ -268,12 +269,6 @@ function AiSoundEditor({
       )}
     </div>
   );
-}
-
-function hashId(id: string): number {
-  let h = 0;
-  for (let i = 0; i < id.length; i++) h = (h << 5) - h + id.charCodeAt(i);
-  return Math.abs(h) % 2147483647;
 }
 
 function AddAlarmModal({
