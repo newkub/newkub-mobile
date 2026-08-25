@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+@theme {
+  --color-*: initial;
+  --color-bg: #0b0b13;
+  --color-surface: #151521;
+  --color-surface-2: #1e1e2d;
+  --color-surface-3: #27273a;
+  --color-border: #2e2e44;
+  --color-muted: #6b7280;
+  --color-text: #f4f4f5;
+  --color-text-secondary: #a1a1aa;
+  --color-primary: #6366f1;
+  --color-primary-glow: #818cf8;
+  --color-accent: #a78bfa;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.glass {
+  background: rgba(30, 30, 45, 0.72);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.glow-primary {
+  box-shadow: 0 0 28px rgba(99, 102, 241, 0.35);
+}
+
+.glow-success {
+  box-shadow: 0 0 28px rgba(34, 197, 94, 0.32);
+}
+
+.glow-danger {
+  box-shadow: 0 0 28px rgba(239, 68, 68, 0.32);
+}
+
+.text-glow {
+  text-shadow: 0 0 24px rgba(99, 102, 241, 0.5);
+}
+
+.tab-content {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.tab-content::-webkit-scrollbar {
+  display: none;
+}
+
+/* Safe areas for notch devices */
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}

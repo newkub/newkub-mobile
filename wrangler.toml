@@ -1,0 +1,5 @@
+name = "new-habbit"
+compatibility_date = "2026-08-25"
+
+[site]
+bucket = "./dist"
