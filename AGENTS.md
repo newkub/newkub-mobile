@@ -15,7 +15,9 @@ Ship `new-habbit` ให้ทำงานบน Android (Capacitor 8) และ
 - Sync: Cloudflare Pages Functions + D1 สำหรับ alarms/reminders
 - Notifications: Capacitor Local Notifications
 - AI sound: ElevenLabs API (TTS)
+- Widget: Android home screen clock widget
 - Deploy: Cloudflare Pages + Wrangler
+- Play Store: release AAB signed and upload-ready
 - Review: /review-codebase
 
 ## Execute
@@ -47,6 +49,10 @@ bun deploy
 
 # create D1 database
 bunx wrangler d1 create new-habbit-db
+
+# build release AAB
+cd android
+./gradlew bundleRelease
 ```
 
 ## Rules
