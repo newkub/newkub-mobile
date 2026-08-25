@@ -1,0 +1,16 @@
+new-habbit is a beautiful lock-screen style clock app for Android and PWA. It helps you start the day and stay focused with five essential tools:
+
+- Alarm: set recurring alarms, choose from built-in sounds or generate a custom AI voice with ElevenLabs.
+- Stopwatch: track laps with best/worst lap highlights and easy share.
+- Timer: use quick presets or create your own with live circle progress.
+- Pomodoro: focus sessions, short & long breaks, and daily cycle stats.
+- Reminder: schedule one-time or recurring reminders months ahead.
+
+Key features:
+- Cloud sync across devices via Cloudflare D1.
+- Home screen clock widget.
+- Lock screen style interface.
+- Onboarding and notification setup.
+- Works offline, syncs when online.
+
+Privacy policy: https://new-habbit.pages.dev/privacy-policy.html
