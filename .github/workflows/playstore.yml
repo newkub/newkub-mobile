@@ -54,7 +54,7 @@ jobs:
         env:
           SIGNING_KEYSTORE_BASE64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
         run: |
-          echo "$SIGNING_KEYSTORE_BASE64" | base64 -d > android/app/new-habbit-upload.keystore
+          echo "$SIGNING_KEYSTORE_BASE64" | base64 -d > android/app/mobile-clock-upload.keystore
 
       - name: Create keystore.properties
         env:
@@ -63,7 +63,7 @@ jobs:
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
         run: |
           cat > android/app/keystore.properties <<EOF
-          storeFile=new-habbit-upload.keystore
+          storeFile=mobile-clock-upload.keystore
           storePassword=$SIGNING_STORE_PASSWORD
           keyAlias=$SIGNING_KEY_ALIAS
           keyPassword=$SIGNING_KEY_PASSWORD
@@ -85,6 +85,6 @@ jobs:
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
-          packageName: com.newhabbit.app
+          packageName: com.newkub.mobileclock
           releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
           track: ${{ inputs.track || 'internal' }}

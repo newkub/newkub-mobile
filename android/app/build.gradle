@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "com.newhabbit.app"
+    namespace = "com.newkub.mobileclock"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.newhabbit.app"
+        applicationId "com.newkub.mobileclock"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -22,9 +22,9 @@ android {
             def keystoreFile = rootProject.file('app/keystore.properties')
             if (keystoreFile.exists()) {
                 keystoreFile.withInputStream { keystoreProps.load(it) }
-                storeFile file(keystoreProps['storeFile'] ?: 'new-habbit-upload.keystore')
+                storeFile file(keystoreProps['storeFile'] ?: 'mobile-clock-upload.keystore')
                 storePassword keystoreProps['storePassword']
-                keyAlias keystoreProps['keyAlias'] ?: 'new-habbit'
+                keyAlias keystoreProps['keyAlias'] ?: 'mobile-clock'
                 keyPassword keystoreProps['keyPassword']
             }
         }

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">New Habbit</string>
-    <string name="title_activity_main">New Habbit</string>
-    <string name="package_name">com.newhabbit.app</string>
-    <string name="custom_url_scheme">com.newhabbit.app</string>
+    <string name="app_name">Mobile Clock</string>
+    <string name="title_activity_main">Mobile Clock</string>
+    <string name="package_name">com.newkub.mobileclock</string>
+    <string name="custom_url_scheme">com.newkub.mobileclock</string>
 </resources>

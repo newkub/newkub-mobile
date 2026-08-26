@@ -3,10 +3,10 @@ import type { Alarm, Reminder } from "../store/app";
 const API_BASE = "/api";
 
 export function getUserId(): string {
-  const fromStorage = localStorage.getItem("new-habbit-user-id");
+  const fromStorage = localStorage.getItem("mobile-clock-user-id");
   if (fromStorage) return fromStorage;
   const id = crypto.randomUUID();
-  localStorage.setItem("new-habbit-user-id", id);
+  localStorage.setItem("mobile-clock-user-id", id);
   return id;
 }
 

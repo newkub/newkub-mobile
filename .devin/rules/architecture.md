@@ -1,6 +1,6 @@
 ---
 name: architecture
-description: Architecture and coding conventions for new-habbit
+description: Architecture and coding conventions for mobile-clock
 ---
 
 ## Goal

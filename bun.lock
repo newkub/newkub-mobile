@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "new-habbit",
+      "name": "mobile-clock",
       "dependencies": {
         "@capacitor/android": "^8.5.0",
         "@capacitor/app": "^8.1.1",

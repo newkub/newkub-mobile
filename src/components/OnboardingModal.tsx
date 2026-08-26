@@ -26,7 +26,7 @@ export function OnboardingModal() {
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
       <div className="w-full max-w-sm rounded-3xl bg-surface p-6">
-        <h2 className="mb-2 text-center text-2xl font-bold">Welcome to new-habbit</h2>
+        <h2 className="mb-2 text-center text-2xl font-bold">Welcome to Mobile Clock</h2>
         <p className="mb-6 text-center text-text-secondary">
           Lock-screen clock with Alarm, Stopwatch, Timer, Pomodoro and Reminder.
         </p>

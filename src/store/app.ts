@@ -173,6 +173,6 @@ export const useAppStore = create<AppState>()(
       firstVisit: true,
       setFirstVisit: (v) => set({ firstVisit: v }),
     }),
-    { name: "new-habbit-store" }
+    { name: "mobile-clock-store" }
   )
 );

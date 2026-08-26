@@ -1,8 +1,8 @@
-name = "new-habbit"
+name = "mobile-clock"
 compatibility_date = "2026-08-25"
 pages_build_output_dir = "dist"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "new-habbit-db"
+database_name = "mobile-clock-db"
 database_id = "655f4ef9-3447-49f7-96fe-64c561b712b5"

@@ -1,6 +1,6 @@
 {
-  "name": "New Habbit",
-  "short_name": "Habbit",
+  "name": "Mobile Clock",
+  "short_name": "Clock",
   "description": "Lock-screen clock app: Alarm, Stopwatch, Timer, Pomodoro, Reminder",
   "start_url": "/",
   "display": "standalone",

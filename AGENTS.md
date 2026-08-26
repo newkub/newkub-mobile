@@ -1,11 +1,11 @@
 ---
-name: new-habbit
+name: mobile-clock
 description: Lock-screen style Android/PWA clock app with Alarm, Stopwatch, Timer, Pomodoro, Reminder
 ---
 
 ## Goal
 
-Ship `new-habbit` ให้ทำงานบน Android (Capacitor 8) และ PWA บน Cloudflare Pages โดยมี 5 tabs หลัก พร้อม Cloudflare Worker + D1 sync และ UX ที่ใช้งานง่าย
+Ship `mobile-clock` ให้ทำงานบน Android (Capacitor 8) และ PWA บน Cloudflare Pages โดยมี 5 tabs หลัก พร้อม Cloudflare Worker + D1 sync และ UX ที่ใช้งานง่าย
 
 ## Scope
 
@@ -48,7 +48,7 @@ bun cap:open
 bun deploy
 
 # create D1 database
-bunx wrangler d1 create new-habbit-db
+bunx wrangler d1 create mobile-clock-db
 
 # build release AAB
 cd android

@@ -1,4 +1,4 @@
-package com.newhabbit.app.widget;
+package com.newkub.mobileclock.widget;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -7,8 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
 
-import com.newhabbit.app.MainActivity;
-import com.newhabbit.app.R;
+import com.newkub.mobileclock.MainActivity;
+import com.newkub.mobileclock.R;
 
 import java.text.DateFormat;
 import java.util.Date;

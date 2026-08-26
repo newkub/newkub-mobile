@@ -1,4 +1,4 @@
-package com.newhabbit.app;
+package com.newkub.mobileclock;
 
 import com.getcapacitor.BridgeActivity;
 

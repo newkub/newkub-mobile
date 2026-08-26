@@ -1,4 +1,4 @@
-# New Habbit
+# Mobile Clock
 
 Lock-screen style clock app for Android and PWA. Built with React 19, Vite 8, Tailwind CSS v4, Capacitor 8 and Cloudflare Pages Functions + D1.
 
@@ -63,8 +63,8 @@ bun run deploy
 ## D1 Setup
 
 ```bash
-bunx wrangler d1 create new-habbit-db
-bunx wrangler d1 execute new-habbit-db --remote --file=schema.sql
+bunx wrangler d1 create mobile-clock-db
+bunx wrangler d1 execute mobile-clock-db --remote --file=schema.sql
 ```
 
 Copy the printed `database_id` into `wrangler.toml` if it differs.
@@ -100,7 +100,7 @@ Copy the printed `database_id` into `wrangler.toml` if it differs.
 
 ## Android Widget
 
-A home screen clock widget is included in the Android app. Long-press on the home screen, select `new-habbit Clock`, and place the widget.
+A home screen clock widget is included in the Android app. Long-press on the home screen, select `Mobile Clock`, and place the widget.
 
 ## Play Store
 

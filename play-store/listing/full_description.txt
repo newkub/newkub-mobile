@@ -1,4 +1,4 @@
-new-habbit is a beautiful lock-screen style clock app for Android and PWA. It helps you start the day and stay focused with five essential tools:
+Mobile Clock is a beautiful lock-screen style clock app for Android and PWA. It helps you start the day and stay focused with five essential tools:
 
 - Alarm: set recurring alarms, choose from built-in sounds or generate a custom AI voice with ElevenLabs.
 - Stopwatch: track laps with best/worst lap highlights and easy share.
@@ -13,4 +13,4 @@ Key features:
 - Onboarding and notification setup.
 - Works offline, syncs when online.
 
-Privacy policy: https://new-habbit.pages.dev/privacy-policy.html
+Privacy policy: https://mobile-clock.pages.dev/privacy-policy.html
