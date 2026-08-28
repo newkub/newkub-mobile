@@ -48,6 +48,12 @@ export default {
         return await handlePush(request, env);
       }
 
+      if (url.pathname === "/") {
+        return new Response("worker ok", {
+          headers: { "X-Worker-Version": "2", "Content-Type": "text/plain" },
+        });
+      }
+
       // Static assets with cache-busting headers
       const assetRes = await env.ASSETS.fetch(request);
       const headers = new Headers(assetRes.headers);
