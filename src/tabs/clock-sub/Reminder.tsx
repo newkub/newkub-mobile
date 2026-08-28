@@ -1,28 +1,191 @@
-import { useState, useEffect } from "react";
-import { Plus, Bell, Calendar, Clock, Trash2, Repeat } from "lucide-react";
+import { createSignal, createMemo, For, onMount, Show } from "solid-js";
 import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
-import { useAppStore, type Reminder } from "../../store/app";
+import {
+  appStore,
+  addReminder,
+  removeReminder,
+  updateReminder,
+  toggleReminder,
+  type Reminder,
+} from "../../store/app";
 import { scheduleAlarm, cancelAlarm, requestNotificationPermission } from "../../lib/notifications";
 import { haptic } from "../../lib/capacitor";
+import { hashId } from "../../lib/hash";
+
+const repeatLabels: Record<string, string> = {
+  none: "Once",
+  daily: "Daily",
+  weekly: "Weekly",
+  monthly: "Monthly",
+};
+
+function ReminderCard(props: {
+  reminder: Reminder;
+  onToggle: () => void;
+  onRemove: () => void;
+  onUpdate: (patch: Partial<Reminder>) => void;
+}) {
+  const [expanded, setExpanded] = createSignal(false);
+
+  return (
+    <div class={`rounded-3xl border bg-surface-2 p-4 transition ${props.reminder.enabled ? "border-primary/30" : "border-border"}`}>
+      <div class="flex items-center gap-3">
+        <div class={`rounded-2xl p-3 ${props.reminder.enabled ? "bg-primary/10 text-primary" : "bg-surface-3 text-text-secondary"}`}>
+          <span class="i-mdi-bell h-6 w-6" />
+        </div>
+        <div class="flex-1" onClick={() => setExpanded(!expanded())}>
+          <p class="font-semibold text-text">{props.reminder.title}</p>
+          <p class="text-sm text-text-secondary">
+            {new Date(`${props.reminder.date}T${props.reminder.time}`).toLocaleString("th-TH", {
+              day: "numeric",
+              month: "short",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}{" "}
+            · {repeatLabels[props.reminder.repeat]}
+          </p>
+        </div>
+        <button
+          onClick={props.onToggle}
+          class={`h-6 w-6 rounded-full border-2 ${props.reminder.enabled ? "border-primary bg-primary" : "border-text-secondary"}`}
+        >
+          {props.reminder.enabled && <span class="block h-3 w-3 translate-x-[3px] translate-y-[3px] rounded-full bg-white" />}
+        </button>
+      </div>
+
+      <Show when={expanded()}>
+        <div class="mt-4 space-y-3 border-t border-border pt-4">
+          <div class="flex gap-2">
+            <div class="flex-1">
+              <label class="mb-1 flex items-center gap-1 text-xs text-text-secondary">
+                <span class="i-mdi-calendar h-3 w-3" /> Date
+              </label>
+              <input
+                type="date"
+                value={props.reminder.date}
+                onInput={(e) => props.onUpdate({ date: e.currentTarget.value })}
+                class="w-full rounded-xl border border-border bg-surface-3 px-3 py-2 text-sm text-text"
+              />
+            </div>
+            <div class="flex-1">
+              <label class="mb-1 flex items-center gap-1 text-xs text-text-secondary">
+                <span class="i-mdi-clock h-3 w-3" /> Time
+              </label>
+              <input
+                type="time"
+                value={props.reminder.time}
+                onInput={(e) => props.onUpdate({ time: e.currentTarget.value })}
+                class="w-full rounded-xl border border-border bg-surface-3 px-3 py-2 text-sm text-text"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="mb-1 flex items-center gap-1 text-xs text-text-secondary">
+              <span class="i-mdi-repeat h-3 w-3" /> Repeat
+            </label>
+            <div class="flex gap-2">
+              <For each={["none", "daily", "weekly", "monthly"] as const}>
+                {(r) => (
+                  <button
+                    onClick={() => props.onUpdate({ repeat: r })}
+                    class={`flex-1 rounded-xl py-2 text-xs font-medium capitalize transition ${
+                      props.reminder.repeat === r
+                        ? "bg-primary text-white"
+                        : "bg-surface-3 text-text-secondary"
+                    }`}
+                  >
+                    {r}
+                  </button>
+                )}
+              </For>
+            </div>
+          </div>
+
+          <Button onClick={props.onRemove} variant="danger" class="w-full">
+            <span class="i-mdi-delete mr-2 h-4 w-4" /> Delete
+          </Button>
+        </div>
+      </Show>
+    </div>
+  );
+}
+
+function AddReminderModal(props: { onClose: () => void; onAdd: (r: Reminder) => void }) {
+  const [title, setTitle] = createSignal("");
+  const initialDate = (() => {
+    const d = new Date();
+    d.setDate(1);
+    d.setMonth(d.getMonth() + 1);
+    return d.toISOString().slice(0, 10);
+  })();
+  const [date, setDate] = createSignal(initialDate);
+  const [time, setTime] = createSignal("09:00");
+  const [repeat, setRepeat] = createSignal<Reminder["repeat"]>("none");
+
+  function save() {
+    props.onAdd({
+      id: `r_${Date.now()}`,
+      title: title() || "Reminder",
+      date: date(),
+      time: time(),
+      repeat: repeat(),
+      enabled: true,
+      createdAt: Date.now(),
+    });
+    props.onClose();
+  }
+
+  return (
+    <div class="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4">
+      <div class="w-full max-w-md rounded-3xl bg-surface p-6">
+        <h2 class="mb-4 flex items-center gap-2 text-xl font-bold">
+          <span class="i-mdi-bell h-6 w-6 text-primary" /> New Reminder
+        </h2>
+        <Input value={title()} onChange={setTitle} placeholder="What to remember?" class="mb-3" />
+        <div class="mb-3 flex gap-2">
+          <Input type="date" value={date()} onChange={setDate} />
+          <Input type="time" value={time()} onChange={setTime} />
+        </div>
+        <div class="mb-5">
+          <label class="mb-2 block text-sm text-text-secondary">Repeat</label>
+          <div class="flex gap-2">
+            <For each={["none", "daily", "weekly", "monthly"] as const}>
+              {(r) => (
+                <button
+                  onClick={() => setRepeat(r)}
+                  class={`flex-1 rounded-xl py-2 text-xs font-medium capitalize transition ${
+                    repeat() === r ? "bg-primary text-white" : "bg-surface-3 text-text-secondary"
+                  }`}
+                >
+                  {r}
+                </button>
+              )}
+            </For>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <Button onClick={props.onClose} variant="secondary" class="flex-1">Cancel</Button>
+          <Button onClick={save} class="flex-1">Save</Button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function ReminderTab() {
-  const reminders = useAppStore((s) => s.reminders);
-  const { addReminder, removeReminder, updateReminder, toggleReminder } = useAppStore();
-  const [isAdding, setIsAdding] = useState(false);
-  const [now, setNow] = useState(new Date());
+  const [isAdding, setIsAdding] = createSignal(false);
+  const [now, setNow] = createSignal(new Date());
 
-  useEffect(() => {
+  onMount(() => {
+    requestNotificationPermission();
+
     const t = setInterval(() => setNow(new Date()), 60000);
     return () => clearInterval(t);
-  }, []);
+  });
 
-  useEffect(() => {
-    requestNotificationPermission();
-  }, []);
-
-  // quick add from notification panel — parse ?title=...&date=...&time=...
-  useEffect(() => {
+  onMount(() => {
     const params = new URLSearchParams(window.location.search);
     const title = params.get("title");
     const date = params.get("date");
@@ -40,13 +203,19 @@ export function ReminderTab() {
       window.history.replaceState({}, "", window.location.pathname);
       haptic("success");
     }
-  }, [addReminder]);
+  });
 
-  const sorted = [...reminders].sort(
-    (a, b) => new Date(`${a.date}T${a.time}`).getTime() - new Date(`${b.date}T${b.time}`).getTime()
+  const sorted = createMemo(() =>
+    [...appStore.reminders].sort(
+      (a, b) => new Date(`${a.date}T${a.time}`).getTime() - new Date(`${b.date}T${b.time}`).getTime()
+    )
   );
-  const future = sorted.filter((r) => new Date(`${r.date}T${r.time}`) >= now);
-  const past = sorted.filter((r) => new Date(`${r.date}T${r.time}`) < now);
+  const future = createMemo(() =>
+    sorted().filter((r) => new Date(`${r.date}T${r.time}`) >= now())
+  );
+  const past = createMemo(() =>
+    sorted().filter((r) => new Date(`${r.date}T${r.time}`) < now())
+  );
 
   async function handleToggle(r: Reminder) {
     const enabled = !r.enabled;
@@ -67,50 +236,50 @@ export function ReminderTab() {
   }
 
   return (
-    <div className="tab-content flex h-full flex-col gap-4 overflow-y-auto p-5 pb-28">
-      <div className="rounded-2xl border border-dashed border-border bg-surface-2/50 p-4">
-        <h3 className="text-sm font-semibold text-text-secondary">Add from notification panel</h3>
-        <p className="mt-1 text-xs text-muted">
-          Share to app with <code>?title=&date=&time=</code> query
+    <div class="tab-content flex h-full flex-col gap-4 overflow-y-auto p-5 pb-28">
+      <div class="rounded-2xl border border-dashed border-border bg-surface-2/50 p-4">
+        <h3 class="text-sm font-semibold text-text-secondary">Add from notification panel</h3>
+        <p class="mt-1 text-xs text-muted">
+          Share to app with <code>?title=&amp;date=&amp;time=</code> query
         </p>
       </div>
 
-      {future.length === 0 && (
-        <div className="rounded-3xl border border-dashed border-border bg-surface-2/50 p-8 text-center">
-          <p className="text-text-secondary">No upcoming reminders</p>
+      <Show when={future().length === 0}>
+        <div class="rounded-3xl border border-dashed border-border bg-surface-2/50 p-8 text-center">
+          <p class="text-text-secondary">No upcoming reminders</p>
         </div>
-      )}
+      </Show>
 
-      {future.map((r) => (
-        <ReminderCard
-          key={r.id}
-          reminder={r}
-          onToggle={() => handleToggle(r)}
-          onRemove={() => removeReminder(r.id)}
-          onUpdate={(patch) => updateReminder(r.id, patch)}
-        />
-      ))}
+      <For each={future()}>
+        {(r) => (
+          <ReminderCard
+            reminder={r}
+            onToggle={() => handleToggle(r)}
+            onRemove={() => removeReminder(r.id)}
+            onUpdate={(patch) => updateReminder(r.id, patch)}
+          />
+        )}
+      </For>
 
-      {past.length > 0 && (
-        <>
-          <h3 className="text-sm font-semibold text-text-secondary">Past</h3>
-          {past.map((r) => (
+      <Show when={past().length > 0}>
+        <h3 class="text-sm font-semibold text-text-secondary">Past</h3>
+        <For each={past()}>
+          {(r) => (
             <ReminderCard
-              key={r.id}
               reminder={r}
               onToggle={() => handleToggle(r)}
               onRemove={() => removeReminder(r.id)}
               onUpdate={(patch) => updateReminder(r.id, patch)}
             />
-          ))}
-        </>
-      )}
+          )}
+        </For>
+      </Show>
 
-      <Button onClick={() => setIsAdding(true)} className="mt-2 w-full" size="lg">
-        <Plus className="mr-2 h-5 w-5" /> New Reminder
+      <Button onClick={() => setIsAdding(true)} class="mt-2 w-full" size="lg">
+        <span class="i-mdi-plus mr-2 h-5 w-5" /> New Reminder
       </Button>
 
-      {isAdding && (
+      <Show when={isAdding()}>
         <AddReminderModal
           onClose={() => setIsAdding(false)}
           onAdd={(r) => {
@@ -122,182 +291,7 @@ export function ReminderTab() {
             haptic("success");
           }}
         />
-      )}
+      </Show>
     </div>
   );
-}
-
-function ReminderCard({
-  reminder,
-  onToggle,
-  onRemove,
-  onUpdate,
-}: {
-  reminder: Reminder;
-  onToggle: () => void;
-  onRemove: () => void;
-  onUpdate: (patch: Partial<Reminder>) => void;
-}) {
-  const [expanded, setExpanded] = useState(false);
-  const repeatLabels: Record<string, string> = {
-    none: "Once",
-    daily: "Daily",
-    weekly: "Weekly",
-    monthly: "Monthly",
-  };
-
-  return (
-    <div className={`rounded-3xl border bg-surface-2 p-4 transition ${reminder.enabled ? "border-primary/30" : "border-border"}`}>
-      <div className="flex items-center gap-3">
-        <div className={`rounded-2xl p-3 ${reminder.enabled ? "bg-primary/10 text-primary" : "bg-surface-3 text-text-secondary"}`}>
-          <Bell className="h-6 w-6" />
-        </div>
-        <div className="flex-1" onClick={() => setExpanded(!expanded)}>
-          <p className="font-semibold text-text">{reminder.title}</p>
-          <p className="text-sm text-text-secondary">
-            {new Date(`${reminder.date}T${reminder.time}`).toLocaleString("th-TH", {
-              day: "numeric",
-              month: "short",
-              hour: "2-digit",
-              minute: "2-digit",
-            })}{" "}
-            · {repeatLabels[reminder.repeat]}
-          </p>
-        </div>
-        <button
-          onClick={onToggle}
-          className={`h-6 w-6 rounded-full border-2 ${reminder.enabled ? "border-primary bg-primary" : "border-text-secondary"}`}
-        >
-          {reminder.enabled && <span className="block h-3 w-3 translate-x-[3px] translate-y-[3px] rounded-full bg-white" />}
-        </button>
-      </div>
-
-      {expanded && (
-        <div className="mt-4 space-y-3 border-t border-border pt-4">
-          <div className="flex gap-2">
-            <div className="flex-1">
-              <label className="mb-1 flex items-center gap-1 text-xs text-text-secondary">
-                <Calendar className="h-3 w-3" /> Date
-              </label>
-              <input
-                type="date"
-                value={reminder.date}
-                onChange={(e) => onUpdate({ date: e.target.value })}
-                className="w-full rounded-xl border border-border bg-surface-3 px-3 py-2 text-sm text-text"
-              />
-            </div>
-            <div className="flex-1">
-              <label className="mb-1 flex items-center gap-1 text-xs text-text-secondary">
-                <Clock className="h-3 w-3" /> Time
-              </label>
-              <input
-                type="time"
-                value={reminder.time}
-                onChange={(e) => onUpdate({ time: e.target.value })}
-                className="w-full rounded-xl border border-border bg-surface-3 px-3 py-2 text-sm text-text"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="mb-1 flex items-center gap-1 text-xs text-text-secondary">
-              <Repeat className="h-3 w-3" /> Repeat
-            </label>
-            <div className="flex gap-2">
-              {(["none", "daily", "weekly", "monthly"] as const).map((r) => (
-                <button
-                  key={r}
-                  onClick={() => onUpdate({ repeat: r })}
-                  className={`flex-1 rounded-xl py-2 text-xs font-medium capitalize transition ${
-                    reminder.repeat === r
-                      ? "bg-primary text-white"
-                      : "bg-surface-3 text-text-secondary"
-                  }`}
-                >
-                  {r}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <Button onClick={onRemove} variant="danger" className="w-full">
-            <Trash2 className="mr-2 h-4 w-4" /> Delete
-          </Button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function AddReminderModal({
-  onClose,
-  onAdd,
-}: {
-  onClose: () => void;
-  onAdd: (r: Reminder) => void;
-}) {
-  const [title, setTitle] = useState("");
-  const [date, setDate] = useState(() => {
-    const d = new Date();
-    d.setDate(1);
-    d.setMonth(d.getMonth() + 1);
-    return d.toISOString().slice(0, 10);
-  });
-  const [time, setTime] = useState("09:00");
-  const [repeat, setRepeat] = useState<Reminder["repeat"]>("none");
-
-  function save() {
-    onAdd({
-      id: `r_${Date.now()}`,
-      title: title || "Reminder",
-      date,
-      time,
-      repeat,
-      enabled: true,
-      createdAt: Date.now(),
-    });
-    onClose();
-  }
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4">
-      <div className="w-full max-w-md rounded-3xl bg-surface p-6">
-        <h2 className="mb-4 flex items-center gap-2 text-xl font-bold">
-          <Bell className="h-6 w-6 text-primary" /> New Reminder
-        </h2>
-        <Input value={title} onChange={setTitle} placeholder="What to remember?" className="mb-3" />
-        <div className="mb-3 flex gap-2">
-          <Input type="date" value={date} onChange={setDate} />
-          <Input type="time" value={time} onChange={setTime} />
-        </div>
-        <div className="mb-5">
-          <label className="mb-2 block text-sm text-text-secondary">Repeat</label>
-          <div className="flex gap-2">
-            {(["none", "daily", "weekly", "monthly"] as const).map((r) => (
-              <button
-                key={r}
-                onClick={() => setRepeat(r)}
-                className={`flex-1 rounded-xl py-2 text-xs font-medium capitalize transition ${
-                  repeat === r ? "bg-primary text-white" : "bg-surface-3 text-text-secondary"
-                }`}
-              >
-                {r}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="flex gap-3">
-          <Button onClick={onClose} variant="secondary" className="flex-1">Cancel</Button>
-          <Button onClick={save} className="flex-1">Save</Button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function hashId(id: string): number {
-  // deterministic small positive int for Capacitor notification id
-  let h = 0;
-  for (let i = 0; i < id.length; i++) h = (h << 5) - h + id.charCodeAt(i);
-  return Math.abs(h) % 2147483647;
 }

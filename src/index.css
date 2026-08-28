@@ -1,7 +1,4 @@
-@import "tailwindcss";
-
-@theme {
-  --color-*: initial;
+:root {
   --color-bg: #0b0b13;
   --color-surface: #151521;
   --color-surface-2: #1e1e2d;
@@ -16,15 +13,6 @@
   --color-success: #22c55e;
   --color-warning: #f59e0b;
   --color-danger: #ef4444;
-
-  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    "Liberation Mono", "Courier New", monospace;
-
-  --radius-lg: 1.25rem;
-  --radius-xl: 1.5rem;
-  --radius-2xl: 2rem;
 }
 
 html,
@@ -74,7 +62,6 @@ body {
   display: none;
 }
 
-/* Safe areas for notch devices */
 .pt-safe {
   padding-top: env(safe-area-inset-top);
 }

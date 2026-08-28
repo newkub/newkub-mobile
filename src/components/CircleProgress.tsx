@@ -1,31 +1,32 @@
+import { type JSX } from "solid-js";
+
 type ProgressProps = {
   size?: number;
   stroke?: number;
   progress: number; // 0-1
   color?: string;
-  children?: React.ReactNode;
+  children?: JSX.Element;
 };
 
-export function CircleProgress({
-  size = 240,
-  stroke = 12,
-  progress,
-  color = "#6366f1",
-  children,
-}: ProgressProps) {
+export function CircleProgress(props: ProgressProps) {
+  const size = props.size ?? 240;
+  const stroke = props.stroke ?? 12;
+  const color = props.color ?? "#6366f1";
+  const progress = Math.max(0, Math.min(1, props.progress));
+
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
-  const dash = c * Math.max(0, Math.min(1, progress));
+  const dash = c * progress;
 
   return (
-    <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
-      <svg width={size} height={size} className="-rotate-90">
+    <div class="relative inline-flex items-center justify-center" style={{ width: `${size}px`, height: `${size}px` }}>
+      <svg width={size} height={size} class="-rotate-90">
         <circle
           cx={size / 2}
           cy={size / 2}
           r={r}
           stroke="rgba(255,255,255,0.06)"
-          strokeWidth={stroke}
+          stroke-width={stroke}
           fill="none"
         />
         <circle
@@ -33,16 +34,16 @@ export function CircleProgress({
           cy={size / 2}
           r={r}
           stroke={color}
-          strokeWidth={stroke}
-          strokeLinecap="round"
+          stroke-width={stroke}
+          stroke-linecap="round"
           fill="none"
           style={{
-            strokeDasharray: `${dash} ${c}`,
+            "stroke-dasharray": `${dash} ${c}`,
             transition: "stroke-dasharray 0.2s linear",
           }}
         />
       </svg>
-      <div className="absolute inset-0 flex items-center justify-center">{children}</div>
+      <div class="absolute inset-0 flex items-center justify-center">{props.children}</div>
     </div>
   );
 }

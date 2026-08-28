@@ -1,9 +1,9 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
+import solid from "vite-plugin-solid";
+import UnoCSS from "unocss/vite";
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [solid(), UnoCSS()],
   build: {
     outDir: "dist",
     target: "es2022",

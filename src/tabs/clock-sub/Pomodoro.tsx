@@ -1,12 +1,11 @@
-import { useState, useCallback, useEffect } from "react";
-import { Play, Pause, RotateCcw, Coffee, Brain, Trophy } from "lucide-react";
+import { createSignal, createMemo, createEffect, For, Show } from "solid-js";
 import { CircleProgress } from "../../components/CircleProgress";
 import { Button } from "../../components/Button";
 import { useInterval } from "../../hooks/use-interval";
 import { haptic } from "../../lib/capacitor";
 import { playBeep } from "../../lib/audio";
 import { formatDuration } from "../../lib/time";
-import { useAppStore } from "../../store/app";
+import { appStore, addPomodoroSession } from "../../store/app";
 
 const FOCUS_SECONDS = 25 * 60;
 const SHORT_BREAK = 5 * 60;
@@ -23,25 +22,30 @@ function todayStr() {
 }
 
 export function PomodoroTab() {
-  const [phase, setPhase] = useState<Phase>("focus");
-  const [remaining, setRemaining] = useState(FOCUS_SECONDS);
-  const [running, setRunning] = useState(false);
-  const [completedInSession, setCompletedInSession] = useState(0);
+  const [phase, setPhase] = createSignal<Phase>("focus");
+  const [remaining, setRemaining] = createSignal(FOCUS_SECONDS);
+  const [running, setRunning] = createSignal(false);
+  const [completedInSession, setCompletedInSession] = createSignal(0);
 
-  const addPomodoroSession = useAppStore((s) => s.addPomodoroSession);
-  const sessions = useAppStore((s) => s.pomodoroSessions);
+  const total = createMemo(() =>
+    phase() === "focus" ? FOCUS_SECONDS : phase() === "short" ? SHORT_BREAK : LONG_BREAK
+  );
 
-  const total = phase === "focus" ? FOCUS_SECONDS : phase === "short" ? SHORT_BREAK : LONG_BREAK;
+  const tick = () => {
+    setRemaining((r) => Math.max(0, r - 1));
+  };
 
-  useEffect(() => {
-    if (running && remaining <= 0) {
+  useInterval(tick, () => (running() ? 1000 : null));
+
+  createEffect(() => {
+    if (running() && remaining() <= 0) {
       playBeep(880, 0.8, "triangle");
       haptic("success");
 
-      if (phase === "focus") {
+      if (phase() === "focus") {
         addPomodoroSession({ date: todayStr(), completedCycles: 1, totalFocusSeconds: FOCUS_SECONDS });
-        setCompletedInSession((c) => c + 1);
-        const nextCount = completedInSession + 1;
+        const nextCount = completedInSession() + 1;
+        setCompletedInSession(nextCount);
         if (nextCount % 4 === 0) {
           setPhase("long");
           setRemaining(LONG_BREAK);
@@ -55,21 +59,19 @@ export function PomodoroTab() {
         setRunning(false);
       }
     }
-  }, [remaining, running, phase, completedInSession, addPomodoroSession]);
+  });
 
-  useInterval(
-    () => {
-      setRemaining((r) => Math.max(0, r - 1));
-    },
-    running ? 1000 : null
-  );
+  const start = () => {
+    setRunning(true);
+  };
 
-  const start = useCallback(() => setRunning(true), []);
-  const pause = useCallback(() => setRunning(false), []);
+  const pause = () => {
+    setRunning(false);
+  };
 
   function reset() {
     setRunning(false);
-    setRemaining(total);
+    setRemaining(total());
     haptic("light");
   }
 
@@ -79,85 +81,91 @@ export function PomodoroTab() {
     setRemaining(next === "focus" ? FOCUS_SECONDS : next === "short" ? SHORT_BREAK : LONG_BREAK);
   }
 
-  const progress = (total - remaining) / total;
-  const color = phase === "focus" ? "#6366f1" : phase === "short" ? "#22c55e" : "#a855f7";
+  const progress = createMemo(() => (total() - remaining()) / total());
+  const color = createMemo(() => (phase() === "focus" ? "#6366f1" : phase() === "short" ? "#22c55e" : "#a855f7"));
 
   const today = todayStr();
-  const todaySession = sessions.find((s) => s.date === today);
-  const todayCycles = todaySession ? todaySession.completedCycles : 0;
-  const totalCycles = sessions.reduce((sum, s) => sum + s.completedCycles, 0);
+  const todayCycles = createMemo(() => {
+    const session = appStore.pomodoroSessions.find((s) => s.date === today);
+    return session ? session.completedCycles : 0;
+  });
+  const totalCycles = createMemo(() => appStore.pomodoroSessions.reduce((sum, s) => sum + s.completedCycles, 0));
 
-  const phaseIcon = {
-    focus: <Brain className="mr-1 inline h-4 w-4" />,
-    short: <Coffee className="mr-1 inline h-4 w-4" />,
-    long: <Coffee className="mr-1 inline h-4 w-4" />,
+  const phaseIcon: Record<Phase, string> = {
+    focus: "i-mdi-brain",
+    short: "i-mdi-coffee",
+    long: "i-mdi-coffee",
   };
 
   return (
-    <div className="tab-content flex h-full flex-col items-center gap-5 overflow-y-auto p-5 pb-28">
-      <div className="flex rounded-full bg-surface-2 p-1">
-        {(["focus", "short", "long"] as Phase[]).map((p) => (
-          <button
-            key={p}
-            onClick={() => manualPhase(p)}
-            className={`flex items-center rounded-full px-4 py-2 text-sm font-semibold capitalize transition ${
-              phase === p
-                ? p === "focus"
-                  ? "bg-primary text-white"
-                  : p === "short"
-                    ? "bg-success text-white"
-                    : "bg-accent text-white"
-                : "text-text-secondary"
-            }`}
-          >
-            {phaseIcon[p]}
-            {p}
-          </button>
-        ))}
+    <div class="tab-content flex h-full flex-col items-center gap-5 overflow-y-auto p-5 pb-28">
+      <div class="flex rounded-full bg-surface-2 p-1">
+        <For each={["focus", "short", "long"] as Phase[]}>
+          {(p) => (
+            <button
+              onClick={() => manualPhase(p)}
+              class={`flex items-center rounded-full px-4 py-2 text-sm font-semibold capitalize transition ${
+                phase() === p
+                  ? p === "focus"
+                    ? "bg-primary text-white"
+                    : p === "short"
+                      ? "bg-success text-white"
+                      : "bg-accent text-white"
+                  : "text-text-secondary"
+              }`}
+            >
+              <span class={`${phaseIcon[p]} mr-1 h-4 w-4`} />
+              {p}
+            </button>
+          )}
+        </For>
       </div>
 
-      <div className="mt-2">
-        <CircleProgress progress={progress} size={260} stroke={14} color={color}>
-          <div className="text-center">
-            <p className="text-6xl font-bold tabular-nums text-glow" style={{ color }}>
-              {format(remaining)}
+      <div class="mt-2">
+        <CircleProgress progress={progress()} size={260} stroke={14} color={color()}>
+          <div class="text-center">
+            <p class="text-6xl font-bold tabular-nums text-glow" style={{ color: color() }}>
+              {format(remaining())}
             </p>
-            <p className="mt-1 text-sm capitalize text-text-secondary">{phase} time</p>
+            <p class="mt-1 text-sm capitalize text-text-secondary">{phase()} time</p>
           </div>
         </CircleProgress>
       </div>
 
-      <div className="flex w-full max-w-sm gap-3">
+      <div class="flex w-full max-w-sm gap-3">
         <Button
-          onClick={running ? pause : start}
-          className="h-16 flex-1 rounded-3xl text-xl"
-          variant={running ? "secondary" : "primary"}
+          onClick={running() ? pause : start}
+          class="h-16 flex-1 rounded-3xl text-xl"
+          variant={running() ? "secondary" : "primary"}
         >
-          {running ? <Pause className="mr-2 h-5 w-5" /> : <Play className="mr-2 h-5 w-5" />}
-          {running ? "Pause" : "Start"}
+          {running() ? (
+            <><span class="i-mdi-pause mr-2 h-5 w-5" /> Pause</>
+          ) : (
+            <><span class="i-mdi-play mr-2 h-5 w-5" /> Start</>
+          )}
         </Button>
-        <Button onClick={reset} className="h-16 flex-1 rounded-3xl text-xl" variant="secondary">
-          <RotateCcw className="mr-2 h-5 w-5" /> Reset
+        <Button onClick={reset} class="h-16 flex-1 rounded-3xl text-xl" variant="secondary">
+          <span class="i-mdi-refresh mr-2 h-5 w-5" /> Reset
         </Button>
       </div>
 
-      <div className="grid w-full max-w-sm grid-cols-2 gap-3">
-        <div className="rounded-2xl bg-surface-2 p-4 text-center">
-          <p className="text-3xl font-bold text-primary">{todayCycles}</p>
-          <p className="text-xs text-text-secondary">Today</p>
+      <div class="grid w-full max-w-sm grid-cols-2 gap-3">
+        <div class="rounded-2xl bg-surface-2 p-4 text-center">
+          <p class="text-3xl font-bold text-primary">{todayCycles()}</p>
+          <p class="text-xs text-text-secondary">Today</p>
         </div>
-        <div className="rounded-2xl bg-surface-2 p-4 text-center">
-          <p className="text-3xl font-bold text-success">{totalCycles}</p>
-          <p className="text-xs text-text-secondary">All time</p>
+        <div class="rounded-2xl bg-surface-2 p-4 text-center">
+          <p class="text-3xl font-bold text-success">{totalCycles()}</p>
+          <p class="text-xs text-text-secondary">All time</p>
         </div>
       </div>
 
-      {todayCycles > 0 && todayCycles % 4 === 0 && (
-        <div className="flex items-center gap-2 rounded-2xl bg-success/10 p-3 text-success">
-          <Trophy className="h-5 w-5" />
-          <span className="font-medium">Great focus streak! Take a long break.</span>
+      <Show when={todayCycles() > 0 && todayCycles() % 4 === 0}>
+        <div class="flex items-center gap-2 rounded-2xl bg-success/10 p-3 text-success">
+          <span class="i-mdi-trophy h-5 w-5" />
+          <span class="font-medium">Great focus streak! Take a long break.</span>
         </div>
-      )}
+      </Show>
     </div>
   );
 }

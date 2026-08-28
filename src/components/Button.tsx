@@ -1,24 +1,19 @@
-import type { ReactNode } from "react";
+import { type JSX } from "solid-js";
 
 type BtnProps = {
-  children: ReactNode;
+  children?: JSX.Element;
   onClick?: () => void;
   variant?: "primary" | "secondary" | "ghost" | "danger";
   size?: "sm" | "md" | "lg";
-  className?: string;
+  class?: string;
   disabled?: boolean;
   type?: "button" | "submit";
 };
 
-export function Button({
-  children,
-  onClick,
-  variant = "primary",
-  size = "md",
-  className = "",
-  disabled,
-  type = "button",
-}: BtnProps) {
+export function Button(props: BtnProps) {
+  const variant = props.variant ?? "primary";
+  const size = props.size ?? "md";
+
   const base =
     "inline-flex items-center justify-center font-semibold rounded-2xl transition active:scale-95 disabled:opacity-40 disabled:active:scale-100";
   const variants = {
@@ -35,12 +30,12 @@ export function Button({
 
   return (
     <button
-      type={type}
-      disabled={disabled}
-      onClick={onClick}
-      className={`${base} ${variants[variant]} ${sizes[size]} ${className}`}
+      type={props.type ?? "button"}
+      disabled={props.disabled}
+      onClick={props.onClick}
+      class={`${base} ${variants[variant]} ${sizes[size]} ${props.class ?? ""}`}
     >
-      {children}
+      {props.children}
     </button>
   );
 }
