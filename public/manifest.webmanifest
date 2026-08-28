@@ -1,7 +1,7 @@
 {
-  "name": "Mobile Clock",
-  "short_name": "Clock",
-  "description": "Lock-screen clock app: Alarm, Stopwatch, Timer, Pomodoro, Reminder",
+  "name": "Newkub Mobile",
+  "short_name": "Newkub",
+  "description": "Personal customizable app — Clock, Tasks, Devin, Notes, Saved, Email, AI tabs",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
@@ -10,7 +10,7 @@
   "categories": ["productivity", "utilities"],
   "icons": [
     {
-      "src": "/icon.svg",
+      "src": "/logo.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"

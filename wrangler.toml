@@ -1,8 +1,17 @@
-name = "mobile-clock"
+name = "newkub-mobile"
 compatibility_date = "2026-08-25"
-pages_build_output_dir = "dist"
+main = "worker/index.ts"
+
+[assets]
+directory = "dist"
+binding = "ASSETS"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "mobile-clock-db"
+database_name = "newkub-mobile-db"
 database_id = "655f4ef9-3447-49f7-96fe-64c561b712b5"
+
+# Secrets: set with `wrangler secret put <NAME>`
+# - OPENAI_API_KEY
+# - CF_ACCOUNT_ID
+# - CF_API_TOKEN

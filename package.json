@@ -1,16 +1,17 @@
 {
-  "name": "mobile-clock",
+  "name": "newkub-mobile",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Lock-screen style clock app with Alarm, Stopwatch, Timer, Pomodoro and Reminder — Android (Capacitor 8) + PWA",
+  "description": "Personal customizable app — Clock, Tasks, Devin, Notes, Saved, Email tabs on Cloudflare Workers + Android (Capacitor 8)",
   "scripts": {
     "dev": "vite",
+    "dev:worker": "wrangler dev",
     "build": "tsc -b && vite build",
     "build:spa": "vite build",
     "preview": "vite preview",
-    "typecheck": "tsc -b --noEmit",
-    "lint": "tsc -b --noEmit",
+    "typecheck": "tsc -b --noEmit && tsc -p tsconfig.worker.json --noEmit",
+    "lint": "tsc -b --noEmit && tsc -p tsconfig.worker.json --noEmit",
     "cap:sync": "bun run build:spa && cap sync android",
     "cap:copy": "bun run build:spa && cap copy android",
     "cap:open": "cap open android",
@@ -18,7 +19,7 @@
     "cap:add:android": "cap add android",
     "test": "vitest run",
     "test:watch": "vitest",
-    "deploy": "wrangler pages deploy dist"
+    "deploy": "wrangler deploy"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",

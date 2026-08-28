@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "com.newkub.mobileclock",
-  appName: "Mobile Clock",
+  appId: "com.newkub.newkubmobile",
+  appName: "Newkub Mobile",
   webDir: "dist",
   server: {
     androidScheme: "https",

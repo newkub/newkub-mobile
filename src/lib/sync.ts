@@ -1,12 +1,12 @@
-import type { Alarm, Reminder } from "../store/app";
+import type { Alarm, Reminder } from "../types";
 
 const API_BASE = "/api";
 
 export function getUserId(): string {
-  const fromStorage = localStorage.getItem("mobile-clock-user-id");
+  const fromStorage = localStorage.getItem("newkub-mobile-user-id");
   if (fromStorage) return fromStorage;
   const id = crypto.randomUUID();
-  localStorage.setItem("mobile-clock-user-id", id);
+  localStorage.setItem("newkub-mobile-user-id", id);
   return id;
 }
 

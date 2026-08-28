@@ -1,43 +1,9 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { deleteAlarm, deleteReminder, pushAlarm, pushReminder } from "../lib/sync";
+import type { Alarm, PomodoroSession, Reminder, TimerPreset } from "../types";
 
-export type Day = "MO" | "TU" | "WE" | "TH" | "FR" | "SA" | "SU";
-
-export interface Alarm {
-  id: string;
-  hour: number;
-  minute: number;
-  label: string;
-  enabled: boolean;
-  repeat: Day[];
-  sound: "beep" | "bell" | "ai";
-  soundUrl?: string;
-  aiText?: string;
-}
-
-export interface TimerPreset {
-  id: string;
-  name: string;
-  seconds: number;
-  color: string;
-}
-
-export interface Reminder {
-  id: string;
-  title: string;
-  date: string; // ISO date
-  time: string; // HH:MM
-  repeat: "none" | "daily" | "weekly" | "monthly";
-  enabled: boolean;
-  createdAt: number;
-}
-
-export interface PomodoroSession {
-  date: string;
-  completedCycles: number;
-  totalFocusSeconds: number;
-}
+export * from "../types";
 
 export interface AppState {
   activeTab: "alarm" | "stopwatch" | "timer" | "pomodoro" | "reminder";
@@ -173,6 +139,6 @@ export const useAppStore = create<AppState>()(
       firstVisit: true,
       setFirstVisit: (v) => set({ firstVisit: v }),
     }),
-    { name: "mobile-clock-store" }
+    { name: "newkub-mobile-store" }
   )
 );

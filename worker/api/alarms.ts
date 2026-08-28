@@ -1,6 +1,6 @@
-import type { Alarm } from "../../src/store/app";
+import type { Alarm } from "../../src/types";
 
-interface Env {
+export interface AlarmsEnv {
   DB: D1Database;
 }
 
@@ -18,10 +18,14 @@ function rowsToAlarms(rows: unknown[]): Alarm[] {
   }));
 }
 
-export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
+function getUserId(url: URL): string | null {
+  return url.searchParams.get("userId");
+}
+
+export async function getAlarms(request: Request, env: AlarmsEnv): Promise<Response> {
   const url = new URL(request.url);
-  const userId = url.searchParams.get("userId");
-  if (!userId) return new Response("Missing userId", { status: 400 });
+  const userId = getUserId(url);
+  if (!userId) return missingUserId();
 
   const { results } = await env.DB
     .prepare("SELECT * FROM alarms WHERE user_id = ? ORDER BY hour, minute")
@@ -29,12 +33,12 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
     .all();
 
   return Response.json(rowsToAlarms(results ?? []));
-};
+}
 
-export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
+export async function postAlarm(request: Request, env: AlarmsEnv): Promise<Response> {
   const url = new URL(request.url);
-  const userId = url.searchParams.get("userId");
-  if (!userId) return new Response("Missing userId", { status: 400 });
+  const userId = getUserId(url);
+  if (!userId) return missingUserId();
 
   const alarm: Alarm = await request.json();
   await env.DB
@@ -68,14 +72,28 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     .run();
 
   return Response.json({ ok: true });
-};
+}
 
-export const onRequestDelete: PagesFunction<Env> = async ({ request, env }) => {
+export async function deleteAlarm(request: Request, env: AlarmsEnv): Promise<Response> {
   const url = new URL(request.url);
-  const userId = url.searchParams.get("userId");
+  const userId = getUserId(url);
   const id = url.searchParams.get("id");
-  if (!userId || !id) return new Response("Missing userId or id", { status: 400 });
+  if (!userId || !id) return missingParams();
 
   await env.DB.prepare("DELETE FROM alarms WHERE user_id = ? AND id = ?").bind(userId, id).run();
   return Response.json({ ok: true });
-};
+}
+
+function missingUserId() {
+  return new Response(JSON.stringify({ error: "Missing userId" }), {
+    status: 400,
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+function missingParams() {
+  return new Response(JSON.stringify({ error: "Missing userId or id" }), {
+    status: 400,
+    headers: { "Content-Type": "application/json" },
+  });
+}

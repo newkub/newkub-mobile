@@ -1,6 +1,6 @@
-import type { Reminder } from "../../src/store/app";
+import type { Reminder } from "../../src/types";
 
-interface Env {
+export interface RemindersEnv {
   DB: D1Database;
 }
 
@@ -16,10 +16,14 @@ function rowsToReminders(rows: unknown[]): Reminder[] {
   }));
 }
 
-export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
+function getUserId(url: URL): string | null {
+  return url.searchParams.get("userId");
+}
+
+export async function getReminders(request: Request, env: RemindersEnv): Promise<Response> {
   const url = new URL(request.url);
-  const userId = url.searchParams.get("userId");
-  if (!userId) return new Response("Missing userId", { status: 400 });
+  const userId = getUserId(url);
+  if (!userId) return missingUserId();
 
   const { results } = await env.DB
     .prepare("SELECT * FROM reminders WHERE user_id = ? ORDER BY date, time")
@@ -27,12 +31,12 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
     .all();
 
   return Response.json(rowsToReminders(results ?? []));
-};
+}
 
-export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
+export async function postReminder(request: Request, env: RemindersEnv): Promise<Response> {
   const url = new URL(request.url);
-  const userId = url.searchParams.get("userId");
-  if (!userId) return new Response("Missing userId", { status: 400 });
+  const userId = getUserId(url);
+  if (!userId) return missingUserId();
 
   const reminder: Reminder = await request.json();
   await env.DB
@@ -60,14 +64,28 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     .run();
 
   return Response.json({ ok: true });
-};
+}
 
-export const onRequestDelete: PagesFunction<Env> = async ({ request, env }) => {
+export async function deleteReminder(request: Request, env: RemindersEnv): Promise<Response> {
   const url = new URL(request.url);
-  const userId = url.searchParams.get("userId");
+  const userId = getUserId(url);
   const id = url.searchParams.get("id");
-  if (!userId || !id) return new Response("Missing userId or id", { status: 400 });
+  if (!userId || !id) return missingParams();
 
   await env.DB.prepare("DELETE FROM reminders WHERE user_id = ? AND id = ?").bind(userId, id).run();
   return Response.json({ ok: true });
-};
+}
+
+function missingUserId() {
+  return new Response(JSON.stringify({ error: "Missing userId" }), {
+    status: 400,
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+function missingParams() {
+  return new Response(JSON.stringify({ error: "Missing userId or id" }), {
+    status: 400,
+    headers: { "Content-Type": "application/json" },
+  });
+}
