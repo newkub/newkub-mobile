@@ -17,6 +17,15 @@ jobs:
       - run: bun typecheck
       - run: bun run test
       - run: bun run build
+
+      - name: Clean up old new-habbit resources
+        run: |
+          bunx wrangler delete new-habbit || true
+          bunx wrangler pages project delete new-habbit --yes || true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        continue-on-error: true
+
       - name: Deploy to Cloudflare Workers
         run: bun run deploy
         env:
