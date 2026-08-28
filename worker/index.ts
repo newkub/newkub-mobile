@@ -48,16 +48,9 @@ export default {
         return await handlePush(request, env);
       }
 
-      if (url.pathname === "/") {
-        return new Response("worker ok", {
-          headers: { "X-Worker-Version": "2", "Content-Type": "text/plain" },
-        });
-      }
-
-      // Static assets with cache-busting headers
+      // Static assets
       const assetRes = await env.ASSETS.fetch(request);
       const headers = new Headers(assetRes.headers);
-      headers.set("X-Worker-Version", "2");
 
       if (url.pathname === "/" || url.pathname === "/index.html") {
         headers.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
