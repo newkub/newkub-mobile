@@ -4,7 +4,7 @@ import "./index.css";
 import App from "./App";
 import { initCapacitor } from "./lib/capacitor";
 import { getUserId } from "./lib/sync";
-import { setUserId, appStore } from "./store/app";
+import { setUserId, appStore, setAppStore } from "./store/app";
 import { pullAlarms, pullReminders } from "./lib/sync";
 import { startAlarmWatcher } from "./lib/notifications";
 
@@ -19,16 +19,8 @@ async function hydrate() {
       pullAlarms(userId),
       pullReminders(userId),
     ]);
-    if (alarms.length) {
-      import("./store/app").then(({ setAppStore }) => {
-        setAppStore("alarms", alarms);
-      });
-    }
-    if (reminders.length) {
-      import("./store/app").then(({ setAppStore }) => {
-        setAppStore("reminders", reminders);
-      });
-    }
+    if (alarms.length) setAppStore("alarms", alarms);
+    if (reminders.length) setAppStore("reminders", reminders);
   } catch {
     // offline or not yet deployed; keep local state
   }
