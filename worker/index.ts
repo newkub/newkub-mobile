@@ -4,12 +4,15 @@ import type { RemindersEnv } from "./api/reminders";
 import { getReminders, postReminder, deleteReminder } from "./api/reminders";
 import { handleStatus } from "./api/status";
 import { handleAiFix } from "./api/ai-fix";
+import { handleDeploy } from "./api/deploy";
+import { handlePush } from "./api/push";
 
 export interface Env extends AlarmsEnv, RemindersEnv {
   ASSETS: Fetcher;
   OPENAI_API_KEY?: string;
   CF_ACCOUNT_ID?: string;
   CF_API_TOKEN?: string;
+  GH_TOKEN?: string;
 }
 
 export default {
@@ -35,6 +38,14 @@ export default {
 
       if (url.pathname === "/api/ai-fix") {
         return await handleAiFix(request, env);
+      }
+
+      if (url.pathname === "/api/deploy") {
+        return await handleDeploy(request, env);
+      }
+
+      if (url.pathname === "/api/push") {
+        return await handlePush(request, env);
       }
 
       // Static assets
