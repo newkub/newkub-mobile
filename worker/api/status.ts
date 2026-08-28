@@ -52,8 +52,8 @@ export async function handleStatus(request: Request, env: StatusEnv): Promise<Re
       error: repoError,
     },
     worker: {
-      name: "new-habbit",
-      url: `https://new-habbit.works.dev`, // placeholder; actual domain from deploy
+      name: "newkub-mobile",
+      url: `https://newkub-mobile.workers.dev`, // placeholder; actual domain from deploy
       dashboard: cloudflareUrl,
       status: cloudflareStatus,
     },

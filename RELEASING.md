@@ -28,7 +28,7 @@ For Play Store, use the upload keystore. Google Play will manage the final app s
 2. Create app with package name `com.newkub.newkubmobile`
 3. Go to `Release > Production > Create new release`
 4. Upload `app-release.aab`
-5. Add release notes, set privacy policy to `https://newkub-mobile.works.dev/privacy-policy.html`
+5. Add release notes, set privacy policy to `https://newkub-mobile.workers.dev/privacy-policy.html`
 6. Complete app listing and content rating
 7. Review and publish
 

@@ -1,4 +1,4 @@
-name = "new-habbit"
+name = "newkub-mobile"
 compatibility_date = "2026-08-25"
 main = "worker/index.ts"
 
