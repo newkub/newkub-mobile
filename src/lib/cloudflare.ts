@@ -13,8 +13,8 @@ export async function fetchWorkerStatus(): Promise<WorkerStatus> {
     return data.worker as WorkerStatus;
   } catch (err) {
     return {
-      name: "newkub-mobile",
-      url: "https://newkub-mobile.works.dev",
+      name: "new-habbit",
+      url: "https://new-habbit.works.dev",
       dashboard: "https://dash.cloudflare.com/",
       status: err instanceof Error ? err.message : "unknown",
     };
