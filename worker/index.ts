@@ -48,8 +48,29 @@ export default {
         return await handlePush(request, env);
       }
 
-      // Static assets
-      return env.ASSETS.fetch(request);
+      // Static assets with cache-busting headers
+      const assetRes = await env.ASSETS.fetch(request);
+      const headers = new Headers(assetRes.headers);
+
+      if (url.pathname === "/" || url.pathname === "/index.html") {
+        headers.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+        headers.set("Pragma", "no-cache");
+        headers.set("Expires", "0");
+        headers.set("CDN-Cache-Control", "no-store");
+      } else if (url.pathname === "/sw.js" || url.pathname === "/manifest.webmanifest" || url.pathname === "/privacy-policy.html") {
+        headers.set("Cache-Control", "no-cache, no-store, must-revalidate");
+        headers.set("CDN-Cache-Control", "no-store");
+      } else if (url.pathname.startsWith("/assets/")) {
+        if (!headers.has("Cache-Control")) {
+          headers.set("Cache-Control", "public, max-age=31536000, immutable");
+        }
+      }
+
+      return new Response(assetRes.body, {
+        status: assetRes.status,
+        statusText: assetRes.statusText,
+        headers,
+      });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Internal server error";
       return new Response(JSON.stringify({ error: message }), {

@@ -1,12 +1,24 @@
 import type { Alarm, Reminder } from "../types";
+import { generateUUID } from "./uuid";
 
 const API_BASE = "/api";
 
 export function getUserId(): string {
-  const fromStorage = localStorage.getItem("newkub-mobile-user-id");
-  if (fromStorage) return fromStorage;
-  const id = crypto.randomUUID();
-  localStorage.setItem("newkub-mobile-user-id", id);
+  try {
+    const fromStorage = localStorage.getItem("newkub-mobile-user-id");
+    if (fromStorage) return fromStorage;
+  } catch {
+    // storage may be blocked in some contexts
+  }
+
+  const id = generateUUID();
+
+  try {
+    localStorage.setItem("newkub-mobile-user-id", id);
+  } catch {
+    // ignore storage failures; the id will be regenerated on the next load
+  }
+
   return id;
 }
 

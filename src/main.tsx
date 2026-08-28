@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { initCapacitor } from "./lib/capacitor";
 import { getUserId, pullAlarms, pullReminders } from "./lib/sync";
 import { useAppStore } from "./store/app";
@@ -53,8 +54,16 @@ setTimeout(() => {
   unsubscribe();
 }, 5000);
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>
-);
+const root = document.getElementById("root");
+if (root) {
+  createRoot(root).render(
+    <StrictMode>
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
+    </StrictMode>
+  );
+} else {
+  // eslint-disable-next-line no-console
+  console.error("Root element not found");
+}

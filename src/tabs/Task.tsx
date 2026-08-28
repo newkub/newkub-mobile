@@ -4,6 +4,7 @@ import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 import { haptic } from "../lib/capacitor";
 import { showStatus } from "../lib/status";
+import { generateUUID } from "../lib/uuid";
 
 interface Task {
   id: string;
@@ -18,7 +19,7 @@ export function TaskTab() {
   function add() {
     if (!value.trim()) return;
     haptic("success");
-    setTasks([...tasks, { id: crypto.randomUUID(), title: value, done: false }]);
+    setTasks([...tasks, { id: generateUUID(), title: value, done: false }]);
     setValue("");
     showStatus("Task added", "success");
   }

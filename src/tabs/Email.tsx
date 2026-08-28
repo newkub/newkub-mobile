@@ -4,6 +4,7 @@ import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 import { haptic } from "../lib/capacitor";
 import { showStatus } from "../lib/status";
+import { generateUUID } from "../lib/uuid";
 
 interface Draft {
   id: string;
@@ -21,7 +22,7 @@ export function EmailTab() {
   function send() {
     if (!to.trim() || !subject.trim()) return;
     haptic("success");
-    const draft: Draft = { id: crypto.randomUUID(), to, subject, body };
+    const draft: Draft = { id: generateUUID(), to, subject, body };
     setDrafts([draft, ...drafts]);
     setTo("");
     setSubject("");

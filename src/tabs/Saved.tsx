@@ -4,6 +4,7 @@ import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 import { haptic } from "../lib/capacitor";
 import { showStatus } from "../lib/status";
+import { generateUUID } from "../lib/uuid";
 
 interface SavedItem {
   id: string;
@@ -19,7 +20,7 @@ export function SavedTab() {
   function add() {
     if (!title.trim() || !url.trim()) return;
     haptic("success");
-    setItems([...items, { id: crypto.randomUUID(), title, url }]);
+    setItems([...items, { id: generateUUID(), title, url }]);
     setTitle("");
     setUrl("");
     showStatus("Saved item added", "success");
