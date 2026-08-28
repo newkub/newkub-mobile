@@ -1,12 +1,12 @@
 import { useState, useCallback, useEffect } from "react";
 import { Play, Pause, RotateCcw, Coffee, Brain, Trophy } from "lucide-react";
-import { CircleProgress } from "../components/CircleProgress";
-import { Button } from "../components/Button";
-import { useInterval } from "../hooks/use-interval";
-import { haptic } from "../lib/capacitor";
-import { playBeep } from "../lib/audio";
-import { formatDuration } from "../lib/time";
-import { useAppStore } from "../store/app";
+import { CircleProgress } from "../../components/CircleProgress";
+import { Button } from "../../components/Button";
+import { useInterval } from "../../hooks/use-interval";
+import { haptic } from "../../lib/capacitor";
+import { playBeep } from "../../lib/audio";
+import { formatDuration } from "../../lib/time";
+import { useAppStore } from "../../store/app";
 
 const FOCUS_SECONDS = 25 * 60;
 const SHORT_BREAK = 5 * 60;

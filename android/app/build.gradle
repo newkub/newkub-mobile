@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "com.newkub.mobileclock"
+    namespace = "com.newkub.newkubmobile"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.newkub.mobileclock"
+        applicationId "com.newkub.newkubmobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -22,9 +22,9 @@ android {
             def keystoreFile = rootProject.file('app/keystore.properties')
             if (keystoreFile.exists()) {
                 keystoreFile.withInputStream { keystoreProps.load(it) }
-                storeFile file(keystoreProps['storeFile'] ?: 'mobile-clock-upload.keystore')
+                storeFile file(keystoreProps['storeFile'] ?: 'newkub-mobile-upload.keystore')
                 storePassword keystoreProps['storePassword']
-                keyAlias keystoreProps['keyAlias'] ?: 'mobile-clock'
+                keyAlias keystoreProps['keyAlias'] ?: 'newkub-mobile'
                 keyPassword keystoreProps['keyPassword']
             }
         }

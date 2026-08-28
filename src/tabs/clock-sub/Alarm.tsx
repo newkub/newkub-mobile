@@ -10,16 +10,16 @@ import {
   Pause,
   Wand2,
 } from "lucide-react";
-import { useAppStore, type Alarm, type Day } from "../store/app";
-import { TimePicker } from "../components/TimePicker";
-import { Button } from "../components/Button";
-import { Switch } from "../components/Switch";
-import { Input } from "../components/Input";
-import { generateSound } from "../lib/elevenlabs";
-import { playAlarmPreview, stopAudio } from "../lib/audio";
-import { haptic } from "../lib/capacitor";
-import { scheduleAlarm, cancelAlarm } from "../lib/notifications";
-import { hashId } from "../lib/hash";
+import { useAppStore, type Alarm, type Day } from "../../store/app";
+import { TimePicker } from "../../components/TimePicker";
+import { Button } from "../../components/Button";
+import { Switch } from "../../components/Switch";
+import { Input } from "../../components/Input";
+import { generateSound } from "../../lib/elevenlabs";
+import { playAlarmPreview, stopAudio } from "../../lib/audio";
+import { haptic } from "../../lib/capacitor";
+import { scheduleAlarm, cancelAlarm } from "../../lib/notifications";
+import { hashId } from "../../lib/hash";
 
 const DAYS: Day[] = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"];
 const DAY_LABELS: Record<Day, string> = {

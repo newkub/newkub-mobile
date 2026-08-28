@@ -1,13 +1,13 @@
 import { useState, useCallback, useEffect } from "react";
 import { Play, Pause, RotateCcw, Plus, Save, Trash2 } from "lucide-react";
-import { CircleProgress } from "../components/CircleProgress";
-import { Button } from "../components/Button";
-import { useInterval } from "../hooks/use-interval";
-import { haptic } from "../lib/capacitor";
-import { playBeep } from "../lib/audio";
-import { formatDuration } from "../lib/time";
-import { useAppStore, type TimerPreset } from "../store/app";
-import { Input } from "../components/Input";
+import { CircleProgress } from "../../components/CircleProgress";
+import { Button } from "../../components/Button";
+import { useInterval } from "../../hooks/use-interval";
+import { haptic } from "../../lib/capacitor";
+import { playBeep } from "../../lib/audio";
+import { formatDuration } from "../../lib/time";
+import { useAppStore, type TimerPreset } from "../../store/app";
+import { Input } from "../../components/Input";
 
 function format(total: number) {
   return formatDuration(total);

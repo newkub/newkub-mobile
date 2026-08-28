@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Mobile Clock</string>
-    <string name="title_activity_main">Mobile Clock</string>
-    <string name="package_name">com.newkub.mobileclock</string>
-    <string name="custom_url_scheme">com.newkub.mobileclock</string>
+    <string name="app_name">Newkub Mobile</string>
+    <string name="title_activity_main">Newkub Mobile</string>
+    <string name="package_name">com.newkub.newkubmobile</string>
+    <string name="custom_url_scheme">com.newkub.newkubmobile</string>
 </resources>

@@ -5,9 +5,87 @@ import type { Alarm, PomodoroSession, Reminder, TimerPreset } from "../types";
 
 export * from "../types";
 
+export interface TabDefinition {
+  id: string;
+  label: string;
+  icon: string;
+  visible: boolean;
+  type: "home" | "clock" | "task" | "devin" | "notes" | "saved" | "email" | "agent" | "custom";
+  settings?: Record<string, unknown>;
+}
+
+export interface HomeWidget {
+  id: string;
+  type: "clock" | "status" | "notes" | "saved" | "email" | "custom";
+  title: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  props?: Record<string, unknown>;
+}
+
+export interface GlobalSettings {
+  startup: "home" | "last" | string;
+  haptics: boolean;
+  statusToast: boolean;
+  notifications: boolean;
+  defaultClockSubTab: string;
+  customLogo: string; // "default" or a data URL
+}
+
+export interface StatusMessage {
+  text: string;
+  type: "info" | "success" | "warning" | "error";
+}
+
+const defaultTabs: TabDefinition[] = [
+  { id: "home", label: "Home", icon: "Home", visible: true, type: "home" },
+  { id: "clock", label: "Clock", icon: "Clock", visible: true, type: "clock" },
+  { id: "task", label: "Task", icon: "CheckCircle2", visible: true, type: "task" },
+  { id: "devin", label: "Devin", icon: "Bot", visible: true, type: "devin" },
+  { id: "notes", label: "Notes", icon: "StickyNote", visible: true, type: "notes" },
+  { id: "saved", label: "Saved", icon: "Bookmark", visible: true, type: "saved" },
+  { id: "email", label: "Email", icon: "Mail", visible: true, type: "email" },
+  { id: "agent", label: "New Tab", icon: "Sparkles", visible: true, type: "agent" },
+];
+
+const defaultGlobal: GlobalSettings = {
+  startup: "home",
+  haptics: true,
+  statusToast: true,
+  notifications: true,
+  defaultClockSubTab: "alarm",
+  customLogo: "default",
+};
+
 export interface AppState {
-  activeTab: "alarm" | "stopwatch" | "timer" | "pomodoro" | "reminder";
-  setActiveTab: (tab: AppState["activeTab"]) => void;
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+  lastVisitedTab: string;
+
+  clockSubTab: string;
+  setClockSubTab: (tab: string) => void;
+
+  tabs: TabDefinition[];
+  addTab: (tab: TabDefinition) => void;
+  removeTab: (id: string) => void;
+  updateTab: (id: string, patch: Partial<TabDefinition>) => void;
+
+  homeWidgets: HomeWidget[];
+  setHomeWidgets: (widgets: HomeWidget[]) => void;
+  addHomeWidget: (widget: HomeWidget) => void;
+  removeHomeWidget: (id: string) => void;
+
+  globalSettings: GlobalSettings;
+  setGlobalSetting: <K extends keyof GlobalSettings>(key: K, value: GlobalSettings[K]) => void;
+
+  tabSettings: Record<string, Record<string, unknown>>;
+  setTabSetting: (tabId: string, key: string, value: unknown) => void;
+
+  status: StatusMessage | null;
+  setStatus: (status: StatusMessage) => void;
+  clearStatus: () => void;
 
   userId: string;
   setUserId: (id: string) => void;
@@ -49,8 +127,56 @@ const defaultPresets: TimerPreset[] = [
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
-      activeTab: "alarm",
-      setActiveTab: (tab) => set({ activeTab: tab }),
+      activeTab: "home",
+      setActiveTab: (tab) =>
+        set(() => ({
+          activeTab: tab,
+          lastVisitedTab: tab,
+        })),
+      lastVisitedTab: "home",
+
+      clockSubTab: "alarm",
+      setClockSubTab: (tab) => set({ clockSubTab: tab }),
+
+      tabs: defaultTabs,
+      addTab: (tab) =>
+        set((s) => ({ tabs: [...s.tabs, tab] })),
+      removeTab: (id) =>
+        set((s) => {
+          if (["home", "clock"].includes(id)) return s;
+          const next = s.tabs.filter((t) => t.id !== id);
+          return { tabs: next };
+        }),
+      updateTab: (id, patch) =>
+        set((s) => ({
+          tabs: s.tabs.map((t) => (t.id === id ? { ...t, ...patch } : t)),
+        })),
+
+      homeWidgets: [],
+      setHomeWidgets: (widgets) => set({ homeWidgets: widgets }),
+      addHomeWidget: (widget) =>
+        set((s) => ({ homeWidgets: [...s.homeWidgets, widget] })),
+      removeHomeWidget: (id) =>
+        set((s) => ({ homeWidgets: s.homeWidgets.filter((w) => w.id !== id) })),
+
+      globalSettings: defaultGlobal,
+      setGlobalSetting: (key, value) =>
+        set((s) => ({
+          globalSettings: { ...s.globalSettings, [key]: value },
+        })),
+
+      tabSettings: {},
+      setTabSetting: (tabId, key, value) =>
+        set((s) => ({
+          tabSettings: {
+            ...s.tabSettings,
+            [tabId]: { ...(s.tabSettings[tabId] ?? {}), [key]: value },
+          },
+        })),
+
+      status: null,
+      setStatus: (status) => set({ status }),
+      clearStatus: () => set({ status: null }),
 
       userId: "",
       setUserId: (id) => set({ userId: id }),

@@ -1,9 +1,9 @@
 import { useState, useRef, useCallback } from "react";
 import { Play, Pause, RotateCcw, Flag, Share2 } from "lucide-react";
-import { CircleProgress } from "../components/CircleProgress";
-import { Button } from "../components/Button";
-import { useInterval } from "../hooks/use-interval";
-import { haptic } from "../lib/capacitor";
+import { CircleProgress } from "../../components/CircleProgress";
+import { Button } from "../../components/Button";
+import { useInterval } from "../../hooks/use-interval";
+import { haptic } from "../../lib/capacitor";
 
 interface Lap {
   id: number;

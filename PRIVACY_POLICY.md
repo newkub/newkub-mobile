@@ -1,10 +1,10 @@
-# Privacy Policy for Mobile Clock
+# Privacy Policy for Newkub Mobile
 
 Effective date: 26 August 2026
 
 ## Overview
 
-Mobile Clock is a lock-screen style clock app that stores your alarms, reminders, and settings locally on your device. Optional cloud sync uses Cloudflare D1 to back up your alarm and reminder data.
+Newkub Mobile is a personal customizable app that stores your tasks, notes, saved links, alarms, reminders, and settings locally on your device. Optional cloud sync uses Cloudflare D1 to back up your alarm and reminder data.
 
 ## Data we collect
 
@@ -30,4 +30,4 @@ You can disable cloud sync at any time by turning off the sync feature in the ap
 
 ## Contact
 
-For questions, open an issue at https://github.com/newkub/mobile-clock/issues.
+For questions, open an issue at https://github.com/newkub/newkub-mobile/issues.

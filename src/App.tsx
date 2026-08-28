@@ -1,94 +1,70 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Settings } from "lucide-react";
 import { Header } from "./components/Header";
 import { TabBar } from "./components/TabBar";
-import { AlarmTab } from "./tabs/Alarm";
-import { StopwatchTab } from "./tabs/Stopwatch";
-import { TimerTab } from "./tabs/Timer";
-import { PomodoroTab } from "./tabs/Pomodoro";
-import { ReminderTab } from "./tabs/Reminder";
-import { useAppStore } from "./store/app";
-import { Button } from "./components/Button";
-import { Input } from "./components/Input";
-import { X, Settings } from "lucide-react";
-import { haptic } from "./lib/capacitor";
+import { StatusToast } from "./components/StatusToast";
+import { SettingsModal } from "./components/SettingsModal";
 import { OnboardingModal } from "./components/OnboardingModal";
-import { LockScreen } from "./components/LockScreen";
+import { HomeTab } from "./tabs/Home";
+import { ClockTab } from "./tabs/Clock";
+import { TaskTab } from "./tabs/Task";
+import { DevinTab } from "./tabs/Devin";
+import { NotesTab } from "./tabs/Notes";
+import { SavedTab } from "./tabs/Saved";
+import { EmailTab } from "./tabs/Email";
+import { AgentTab } from "./tabs/Agent";
+import { CustomTab } from "./tabs/Custom";
+import { useAppStore } from "./store/app";
 
-const tabs = {
-  alarm: AlarmTab,
-  stopwatch: StopwatchTab,
-  timer: TimerTab,
-  pomodoro: PomodoroTab,
-  reminder: ReminderTab,
+const builtInTabs: Record<string, React.ComponentType> = {
+  home: HomeTab,
+  clock: ClockTab,
+  task: TaskTab,
+  devin: DevinTab,
+  notes: NotesTab,
+  saved: SavedTab,
+  email: EmailTab,
+  agent: AgentTab,
 };
 
 export default function App() {
   const activeTab = useAppStore((s) => s.activeTab);
+  const globalSettings = useAppStore((s) => s.globalSettings);
+  const setActiveTab = useAppStore((s) => s.setActiveTab);
+  const tabs = useAppStore((s) => s.tabs);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [unlocked, setUnlocked] = useState(false);
-  const Tab = tabs[activeTab];
+
+  useEffect(() => {
+    if (globalSettings.startup === "home") {
+      setActiveTab("home");
+    } else if (globalSettings.startup === "last") {
+      // activeTab restored by persist
+    } else if (tabs.find((t) => t.id === globalSettings.startup && t.visible)) {
+      setActiveTab(globalSettings.startup);
+    }
+  }, []); // run once on mount
+
+  const Component = builtInTabs[activeTab];
+  const customTab = tabs.find((t) => t.id === activeTab && t.type === "custom");
 
   return (
     <div className="relative flex h-screen w-screen flex-col bg-bg">
       <div className="fixed right-4 top-0 z-50 pt-safe">
         <button
-          onClick={() => { setSettingsOpen(true); haptic("light"); }}
+          onClick={() => { setSettingsOpen(true); }}
           className="mt-4 rounded-full bg-surface-2 p-2.5 text-text-secondary transition hover:text-text"
         >
           <Settings className="h-5 w-5" />
         </button>
       </div>
       <Header />
-      <main className="flex-1 overflow-hidden pt-2">
-        <Tab />
+      <StatusToast />
+      <main className="flex-1 overflow-y-auto overflow-x-hidden pb-20 pt-2">
+        {Component ? <Component /> : customTab ? <CustomTab tab={customTab} /> : <HomeTab />}
       </main>
       <TabBar />
       {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
       <OnboardingModal />
-      {!unlocked && <LockScreen onUnlock={() => setUnlocked(true)} />}
-    </div>
-  );
-}
-
-function SettingsModal({ onClose }: { onClose: () => void }) {
-  const key = useAppStore((s) => s.elevenLabsKey);
-  const setKey = useAppStore((s) => s.setElevenLabsKey);
-  const [value, setValue] = useState(key);
-
-  function save() {
-    setKey(value);
-    haptic("success");
-    onClose();
-  }
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4">
-      <div className="w-full max-w-md rounded-3xl bg-surface p-6">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="flex items-center gap-2 text-xl font-bold">
-            <Settings className="h-6 w-6 text-primary" /> Settings
-          </h2>
-          <button onClick={onClose} className="rounded-full p-2 text-text-secondary hover:text-text">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        <div className="rounded-2xl border border-border bg-surface-2 p-4">
-          <label className="mb-2 flex items-center gap-2 text-sm font-medium text-text">
-            ElevenLabs API Key
-            <span className="rounded bg-primary/10 px-2 py-0.5 text-xs text-primary">for AI alarm sounds</span>
-          </label>
-          <Input
-            type="text"
-            value={value}
-            onChange={setValue}
-            placeholder="sk_..."
-          />
-          <p className="mt-2 text-xs text-muted">
-            Stored locally on device. Never shared.
-          </p>
-        </div>
-        <Button onClick={save} className="mt-5 w-full">Save</Button>
-      </div>
     </div>
   );
 }

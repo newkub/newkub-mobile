@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { Plus, Bell, Calendar, Clock, Trash2, Repeat } from "lucide-react";
-import { Button } from "../components/Button";
-import { Input } from "../components/Input";
-import { useAppStore, type Reminder } from "../store/app";
-import { scheduleAlarm, cancelAlarm, requestNotificationPermission } from "../lib/notifications";
-import { haptic } from "../lib/capacitor";
+import { Button } from "../../components/Button";
+import { Input } from "../../components/Input";
+import { useAppStore, type Reminder } from "../../store/app";
+import { scheduleAlarm, cancelAlarm, requestNotificationPermission } from "../../lib/notifications";
+import { haptic } from "../../lib/capacitor";
 
 export function ReminderTab() {
   const reminders = useAppStore((s) => s.reminders);

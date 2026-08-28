@@ -1,30 +1,64 @@
-import { AlarmClock, Timer, Hourglass, Briefcase, ClipboardList } from "lucide-react";
+import {
+  AlarmClock,
+  Bookmark,
+  Bot,
+  CheckCircle2,
+  CheckSquare,
+  Clock,
+  Home,
+  Inbox,
+  Mail,
+  NotebookPen,
+  Plus,
+  Sparkles,
+  StickyNote,
+  type LucideIcon,
+} from "lucide-react";
 import { useAppStore } from "../store/app";
 import { haptic } from "../lib/capacitor";
+import { showStatus } from "../lib/status";
 
-const tabs = [
-  { id: "alarm" as const, label: "Alarm", Icon: AlarmClock },
-  { id: "stopwatch" as const, label: "Stopwatch", Icon: Timer },
-  { id: "timer" as const, label: "Timer", Icon: Hourglass },
-  { id: "pomodoro" as const, label: "Pomodoro", Icon: Briefcase },
-  { id: "reminder" as const, label: "Reminder", Icon: ClipboardList },
-];
+const iconMap: Record<string, LucideIcon> = {
+  Home,
+  Clock,
+  AlarmClock,
+  CheckCircle2,
+  CheckSquare,
+  Bot,
+  StickyNote,
+  NotebookPen,
+  Bookmark,
+  Mail,
+  Inbox,
+  Sparkles,
+  Plus,
+};
 
 export function TabBar() {
   const activeTab = useAppStore((s) => s.activeTab);
   const setActiveTab = useAppStore((s) => s.setActiveTab);
+  const tabs = useAppStore((s) => s.tabs.filter((t) => t.visible && t.id !== "agent"));
+
+  function activate(id: string) {
+    haptic("light");
+    setActiveTab(id);
+  }
+
+  function openAgent() {
+    haptic("light");
+    setActiveTab("agent");
+    showStatus("Create a new tab with AI", "info");
+  }
 
   return (
     <nav className="glass fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around rounded-t-3xl pb-safe">
-      {tabs.map(({ id, label, Icon }) => {
+      {tabs.map(({ id, label, icon }) => {
         const active = id === activeTab;
+        const Icon = iconMap[icon] ?? Sparkles;
         return (
           <button
             key={id}
-            onClick={() => {
-              haptic("light");
-              setActiveTab(id);
-            }}
+            onClick={() => activate(id)}
             className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 transition active:scale-95 ${
               active ? "text-primary" : "text-text-secondary"
             }`}
@@ -37,6 +71,15 @@ export function TabBar() {
           </button>
         );
       })}
+      <button
+        onClick={openAgent}
+        className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 transition active:scale-95 ${
+          activeTab === "agent" ? "text-primary" : "text-text-secondary"
+        }`}
+      >
+        <Plus className="h-6 w-6" strokeWidth={activeTab === "agent" ? 2.5 : 2} />
+        <span className="text-[10px] font-medium">New</span>
+      </button>
     </nav>
   );
 }
