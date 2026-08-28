@@ -6,18 +6,16 @@ on:
   workflow_dispatch:
 
 jobs:
-  verify:
-    uses: ./.github/workflows/ci.yml
-
   deploy:
     runs-on: ubuntu-latest
-    needs: verify
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
       - run: bun install
+      - run: bun typecheck
+      - run: bun run test
       - run: bun build
       - name: Deploy to Cloudflare Workers
         run: bun deploy
