@@ -46,11 +46,11 @@ export default function App() {
   return (
     <div class="flex h-screen w-full flex-col bg-bg text-text">
       <Header />
+      <TabBar />
       <StatusToast />
-      <main class="tab-content flex-1 overflow-y-auto px-4 pb-24 pt-2">
+      <main class="tab-content flex-1 overflow-y-auto px-4 pb-4 pt-2">
         <Dynamic component={activeComponent()} />
       </main>
-      <TabBar />
       <OnboardingModal />
       {appStore.settingsOpen && <SettingsModal onClose={closeSettings} />}
     </div>

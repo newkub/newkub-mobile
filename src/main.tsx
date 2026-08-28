@@ -1,5 +1,6 @@
 import { render } from "solid-js/web";
 import "uno.css";
+import "./theme.css";
 import "./index.css";
 import App from "./App";
 import { initCapacitor } from "./lib/capacitor";

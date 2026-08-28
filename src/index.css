@@ -1,20 +1,3 @@
-:root {
-  --color-bg: #0b0b13;
-  --color-surface: #151521;
-  --color-surface-2: #1e1e2d;
-  --color-surface-3: #27273a;
-  --color-border: #2e2e44;
-  --color-muted: #6b7280;
-  --color-text: #f4f4f5;
-  --color-text-secondary: #a1a1aa;
-  --color-primary: #6366f1;
-  --color-primary-glow: #818cf8;
-  --color-accent: #a78bfa;
-  --color-success: #22c55e;
-  --color-warning: #f59e0b;
-  --color-danger: #ef4444;
-}
-
 html,
 body,
 #root {
@@ -24,15 +7,15 @@ body,
 }
 
 body {
-  background: var(--color-bg);
-  color: var(--color-text);
+  background: hsl(var(--color-bg));
+  color: hsl(var(--color-text));
   font-family: var(--font-sans);
   -webkit-tap-highlight-color: transparent;
   user-select: none;
 }
 
 .glass {
-  background: rgba(30, 30, 45, 0.72);
+  background: hsl(var(--color-surface-2) / 0.72);
   backdrop-filter: blur(24px) saturate(140%);
   -webkit-backdrop-filter: blur(24px) saturate(140%);
   border: 1px solid rgba(255, 255, 255, 0.06);

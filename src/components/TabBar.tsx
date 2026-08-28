@@ -77,45 +77,37 @@ export function TabBar() {
     showStatus("Create a new tab with AI", "info");
   }
 
-  const visibleTabs = () => appStore.tabs.filter((t) => t.visible && t.id !== "agent");
+  const visibleTabs = () => appStore.tabs.filter((t) => t.visible);
 
   return (
-    <nav class="glass fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around rounded-t-3xl pb-safe">
+    <nav class="glass mx-4 mb-2 inline-flex max-w-full gap-1 rounded-2xl p-1 overflow-x-auto" aria-label="Main tabs">
       <For each={visibleTabs()}>
         {(tab) => {
-          const active = tab.id === appStore.activeTab;
+          const active = () => tab.id === appStore.activeTab;
           return (
             <button
               onClick={() => activate(tab.id)}
-              class={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 transition active:scale-95 ${
-                active ? "text-primary" : "text-text-secondary"
+              class={`inline-flex shrink-0 items-center gap-1.5 min-h-10 rounded-xl px-3 py-1.5 text-xs font-medium transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 ${
+                active() ? "bg-primary text-white" : "text-text-secondary hover:text-text"
               }`}
+              aria-current={active() ? "page" : undefined}
+              aria-label={tab.label}
             >
-              <span
-                class={`${tabIconClass(tab.icon)} h-6 w-6 transition-transform duration-200 ${
-                  active ? "opacity-100" : "opacity-80"
-                }`}
-              />
-              <span class="text-[10px] font-medium">{tab.label}</span>
-              {active && (
-                <span class="absolute bottom-1 h-1 w-8 rounded-full bg-primary transition-all duration-200" />
-              )}
+              <span class={`${tabIconClass(tab.icon)} h-4 w-4`} aria-hidden="true" />
+              <span>{tab.label}</span>
             </button>
           );
         }}
       </For>
       <button
         onClick={openAgent}
-        class={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 transition active:scale-95 ${
-          appStore.activeTab === "agent" ? "text-primary" : "text-text-secondary"
+        class={`inline-flex shrink-0 items-center gap-1.5 min-h-10 rounded-xl px-3 py-1.5 text-xs font-medium transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 ${
+          appStore.activeTab === "agent" ? "bg-primary text-white" : "text-text-secondary hover:text-text"
         }`}
+        aria-label="New tab"
       >
-        <span
-          class={`i-mdi-plus h-6 w-6 ${
-            appStore.activeTab === "agent" ? "opacity-100" : "opacity-80"
-          }`}
-        />
-        <span class="text-[10px] font-medium">New</span>
+        <span class="i-mdi-plus h-4 w-4" aria-hidden="true" />
+        <span>New</span>
       </button>
     </nav>
   );

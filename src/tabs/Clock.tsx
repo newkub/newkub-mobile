@@ -18,24 +18,7 @@ const subTabs = [
 export function ClockTab() {
   return (
     <div class="flex h-full flex-col px-4">
-      <div class="glass mb-3 inline-flex justify-center gap-2 rounded-2xl p-1">
-        <For each={subTabs}>
-          {({ id, label }) => {
-            const active = id === appStore.clockSubTab;
-            return (
-              <button
-                onClick={() => { haptic("light"); setClockSubTab(id); }}
-                class={`rounded-xl px-3 py-1.5 text-xs font-medium capitalize transition ${
-                  active ? "bg-primary text-white" : "text-text-secondary hover:text-text"
-                }`}
-              >
-                {label}
-              </button>
-            );
-          }}
-        </For>
-      </div>
-      <div class="flex-1 overflow-y-auto pb-6">
+      <div class="flex-1 overflow-y-auto pb-4">
         <Switch fallback={<AlarmTab />}>
           <Match when={appStore.clockSubTab === "alarm"}><AlarmTab /></Match>
           <Match when={appStore.clockSubTab === "stopwatch"}><StopwatchTab /></Match>
@@ -43,6 +26,23 @@ export function ClockTab() {
           <Match when={appStore.clockSubTab === "pomodoro"}><PomodoroTab /></Match>
           <Match when={appStore.clockSubTab === "reminder"}><ReminderTab /></Match>
         </Switch>
+      </div>
+      <div class="glass mt-3 inline-flex justify-center gap-2 rounded-2xl p-1 pb-safe">
+        <For each={subTabs}>
+          {({ id, label }) => {
+            const active = () => id === appStore.clockSubTab;
+            return (
+              <button
+                onClick={() => { haptic("light"); setClockSubTab(id); }}
+                class={`rounded-xl px-3 py-1.5 text-xs font-medium capitalize transition ${
+                  active() ? "bg-primary text-white" : "text-text-secondary hover:text-text"
+                }`}
+              >
+                {label}
+              </button>
+            );
+          }}
+        </For>
       </div>
     </div>
   );
