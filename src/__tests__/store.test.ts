@@ -1,36 +1,53 @@
-import { describe, expect, it } from "vitest";
-import { useAppStore } from "../store/app";
+import { describe, expect, it, beforeEach } from "vitest";
+import { appStore, addAlarm, toggleAlarm, removeAlarm, resetStore } from "../store/app";
+
+beforeEach(() => {
+  resetStore();
+});
 
 describe("app store", () => {
   it("starts with an empty alarm list", () => {
-    const state = useAppStore.getState();
-    expect(state.alarms).toEqual([]);
+    expect(appStore.alarms).toEqual([]);
   });
 
   it("can add an alarm", () => {
-    const state = useAppStore.getState();
-    state.addAlarm({
+    addAlarm({
       id: "test-alarm",
       hour: 7,
       minute: 0,
-      days: ["mon"],
+      repeat: ["MO"],
       enabled: true,
       label: "Test",
-      soundUrl: "",
-      aiPrompt: "",
+      sound: "beep",
     });
-    expect(useAppStore.getState().alarms).toHaveLength(1);
+    expect(appStore.alarms).toHaveLength(1);
   });
 
   it("can toggle an alarm", () => {
-    const state = useAppStore.getState();
-    state.toggleAlarm("test-alarm");
-    expect(useAppStore.getState().alarms[0].enabled).toBe(false);
+    addAlarm({
+      id: "test-alarm",
+      hour: 7,
+      minute: 0,
+      repeat: ["MO"],
+      enabled: true,
+      label: "Test",
+      sound: "beep",
+    });
+    toggleAlarm("test-alarm");
+    expect(appStore.alarms[0].enabled).toBe(false);
   });
 
   it("can remove an alarm", () => {
-    const state = useAppStore.getState();
-    state.removeAlarm("test-alarm");
-    expect(useAppStore.getState().alarms).toHaveLength(0);
+    addAlarm({
+      id: "test-alarm",
+      hour: 7,
+      minute: 0,
+      repeat: ["MO"],
+      enabled: true,
+      label: "Test",
+      sound: "beep",
+    });
+    removeAlarm("test-alarm");
+    expect(appStore.alarms).toHaveLength(0);
   });
 });

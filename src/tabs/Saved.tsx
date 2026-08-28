@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Bookmark, Plus, Trash2, ExternalLink } from "lucide-react";
+import { createSignal, For } from "solid-js";
 import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 import { haptic } from "../lib/capacitor";
@@ -13,14 +12,14 @@ interface SavedItem {
 }
 
 export function SavedTab() {
-  const [items, setItems] = useState<SavedItem[]>([]);
-  const [title, setTitle] = useState("");
-  const [url, setUrl] = useState("");
+  const [items, setItems] = createSignal<SavedItem[]>([]);
+  const [title, setTitle] = createSignal("");
+  const [url, setUrl] = createSignal("");
 
   function add() {
-    if (!title.trim() || !url.trim()) return;
+    if (!title().trim() || !url().trim()) return;
     haptic("success");
-    setItems([...items, { id: generateUUID(), title, url }]);
+    setItems([...items(), { id: generateUUID(), title: title(), url: url() }]);
     setTitle("");
     setUrl("");
     showStatus("Saved item added", "success");
@@ -28,35 +27,37 @@ export function SavedTab() {
 
   function remove(id: string) {
     haptic("light");
-    setItems(items.filter((i) => i.id !== id));
+    setItems(items().filter((i) => i.id !== id));
     showStatus("Removed", "info");
   }
 
   return (
-    <div className="flex h-full flex-col px-4">
-      <div className="mb-4 space-y-2">
-        <Input value={title} onChange={setTitle} placeholder="Title" />
-        <div className="flex gap-2">
-          <Input value={url} onChange={setUrl} placeholder="https://..." className="flex-1" />
+    <div class="flex h-full flex-col px-4">
+      <div class="mb-4 space-y-2">
+        <Input value={title()} onChange={setTitle} placeholder="Title" />
+        <div class="flex gap-2">
+          <Input value={url()} onChange={setUrl} placeholder="https://..." class="flex-1" />
           <Button onClick={add}>
-            <Plus className="h-5 w-5" />
+            <span class="i-mdi-plus h-5 w-5" />
           </Button>
         </div>
       </div>
-      <div className="space-y-2">
-        {items.length === 0 && <p className="text-center text-sm text-text-secondary">No saved links yet</p>}
-        {items.map((i) => (
-          <div key={i.id} className="flex items-center gap-3 rounded-2xl bg-surface-2 p-3">
-            <Bookmark className="h-5 w-5 text-primary" />
-            <span className="flex-1 truncate text-sm text-text">{i.title}</span>
-            <a href={i.url} target="_blank" rel="noreferrer" onClick={() => haptic("light")} className="text-text-secondary hover:text-primary">
-              <ExternalLink className="h-4 w-4" />
-            </a>
-            <button onClick={() => remove(i.id)} className="text-text-secondary hover:text-rose-400">
-              <Trash2 className="h-4 w-4" />
-            </button>
-          </div>
-        ))}
+      <div class="space-y-2">
+        {items().length === 0 && <p class="text-center text-sm text-text-secondary">No saved links yet</p>}
+        <For each={items()}>
+          {(i) => (
+            <div class="flex items-center gap-3 rounded-2xl bg-surface-2 p-3">
+              <span class="i-mdi-bookmark h-5 w-5 text-primary" />
+              <span class="flex-1 truncate text-sm text-text">{i.title}</span>
+              <a href={i.url} target="_blank" rel="noreferrer" onClick={() => haptic("light")} class="text-text-secondary hover:text-primary">
+                <span class="i-mdi-open-in-new h-4 w-4" />
+              </a>
+              <button onClick={() => remove(i.id)} class="text-text-secondary hover:text-rose-400">
+                <span class="i-mdi-delete h-4 w-4" />
+              </button>
+            </div>
+          )}
+        </For>
       </div>
     </div>
   );

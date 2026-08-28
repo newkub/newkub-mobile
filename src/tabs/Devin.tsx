@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Bot, MessageSquare, Sparkles, Terminal, Rocket, GitBranch, Cloud, Loader2 } from "lucide-react";
+import { createSignal, For } from "solid-js";
 import { AiFixPanel } from "../components/AiFixPanel";
 import { haptic } from "../lib/capacitor";
 import { showStatus } from "../lib/status";
@@ -7,14 +6,14 @@ import { fetchWorkerStatus } from "../lib/cloudflare";
 import { fetchRepoStatus } from "../lib/github";
 
 const agents = [
-  { id: "devin", name: "Devin", desc: "General coding assistant", icon: Bot },
-  { id: "debugger", name: "Debugger", desc: "Find and fix bugs", icon: Terminal },
-  { id: "reviewer", name: "Reviewer", desc: "Review code and UX", icon: MessageSquare },
-  { id: "creative", name: "Creative", desc: "Brainstorm ideas", icon: Sparkles },
+  { id: "devin", name: "Devin", desc: "General coding assistant", icon: "i-mdi-robot" },
+  { id: "debugger", name: "Debugger", desc: "Find and fix bugs", icon: "i-mdi-console" },
+  { id: "reviewer", name: "Reviewer", desc: "Review code and UX", icon: "i-mdi-message-text" },
+  { id: "creative", name: "Creative", desc: "Brainstorm ideas", icon: "i-mdi-sparkles" },
 ];
 
 export function DevinTab() {
-  const [opsLoading, setOpsLoading] = useState<string | null>(null);
+  const [opsLoading, setOpsLoading] = createSignal<string | null>(null);
 
   function run(agent: string) {
     haptic("light");
@@ -70,46 +69,50 @@ export function DevinTab() {
     }
   }
 
-  const opButton = (id: string, label: string, Icon: typeof Bot, onClick: () => void) => {
-    const loading = opsLoading === id;
+  function opButton(id: string, label: string, icon: string, onClick: () => void) {
+    const loading = opsLoading() === id;
     return (
       <button
-        key={id}
         onClick={onClick}
         disabled={loading}
-        className="flex items-center gap-2 rounded-xl bg-surface-2 px-3 py-2 text-sm font-medium text-text transition hover:bg-surface-3 disabled:opacity-50"
+        class="flex items-center gap-2 rounded-xl bg-surface-2 px-3 py-2 text-sm font-medium text-text transition hover:bg-surface-3 disabled:opacity-50"
       >
-        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Icon className="h-4 w-4 text-primary" />}
+        {loading ? (
+          <span class="i-mdi-loading h-4 w-4 animate-spin" />
+        ) : (
+          <span class={`${icon} h-4 w-4 text-primary`} />
+        )}
         {label}
       </button>
     );
-  };
+  }
 
   return (
-    <div className="flex h-full flex-col gap-4 px-4">
+    <div class="flex h-full flex-col gap-4 px-4">
       <div>
-        <h2 className="mb-3 text-lg font-bold text-text">AI Agents</h2>
-        <div className="grid grid-cols-2 gap-3">
-          {agents.map(({ id, name, desc, icon: Icon }) => (
-            <button
-              key={id}
-              onClick={() => run(name)}
-              className="flex flex-col items-start gap-2 rounded-2xl bg-surface-2 p-4 text-left transition active:scale-95"
-            >
-              <Icon className="h-6 w-6 text-primary" />
-              <span className="font-semibold text-text">{name}</span>
-              <span className="text-xs text-text-secondary">{desc}</span>
-            </button>
-          ))}
+        <h2 class="mb-3 text-lg font-bold text-text">AI Agents</h2>
+        <div class="grid grid-cols-2 gap-3">
+          <For each={agents}>
+            {({ name, desc, icon }) => (
+              <button
+                onClick={() => run(name)}
+                class="flex flex-col items-start gap-2 rounded-2xl bg-surface-2 p-4 text-left transition active:scale-95"
+              >
+                <span class={`${icon} h-6 w-6 text-primary`} />
+                <span class="font-semibold text-text">{name}</span>
+                <span class="text-xs text-text-secondary">{desc}</span>
+              </button>
+            )}
+          </For>
         </div>
       </div>
 
       <div>
-        <h2 className="mb-3 text-lg font-bold text-text">Ops</h2>
-        <div className="mb-4 flex flex-wrap gap-2">
-          {opButton("status", "Refresh status", Cloud, refreshStatus)}
-          {opButton("deploy", "Deploy", Rocket, deploy)}
-          {opButton("push", "Push to GitHub", GitBranch, push)}
+        <h2 class="mb-3 text-lg font-bold text-text">Ops</h2>
+        <div class="mb-4 flex flex-wrap gap-2">
+          {opButton("status", "Refresh status", "i-mdi-cloud", refreshStatus)}
+          {opButton("deploy", "Deploy", "i-mdi-rocket", deploy)}
+          {opButton("push", "Push to GitHub", "i-mdi-source-branch", push)}
         </div>
         <AiFixPanel />
       </div>

@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Send, Inbox, Trash2 } from "lucide-react";
+import { createSignal, For } from "solid-js";
 import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 import { haptic } from "../lib/capacitor";
@@ -14,16 +13,16 @@ interface Draft {
 }
 
 export function EmailTab() {
-  const [drafts, setDrafts] = useState<Draft[]>([]);
-  const [to, setTo] = useState("");
-  const [subject, setSubject] = useState("");
-  const [body, setBody] = useState("");
+  const [drafts, setDrafts] = createSignal<Draft[]>([]);
+  const [to, setTo] = createSignal("");
+  const [subject, setSubject] = createSignal("");
+  const [body, setBody] = createSignal("");
 
   function send() {
-    if (!to.trim() || !subject.trim()) return;
+    if (!to().trim() || !subject().trim()) return;
     haptic("success");
-    const draft: Draft = { id: generateUUID(), to, subject, body };
-    setDrafts([draft, ...drafts]);
+    const draft: Draft = { id: generateUUID(), to: to(), subject: subject(), body: body() };
+    setDrafts([draft, ...drafts()]);
     setTo("");
     setSubject("");
     setBody("");
@@ -32,40 +31,46 @@ export function EmailTab() {
 
   function remove(id: string) {
     haptic("light");
-    setDrafts(drafts.filter((d) => d.id !== id));
+    setDrafts(drafts().filter((d) => d.id !== id));
     showStatus("Draft removed", "info");
   }
 
   return (
-    <div className="flex h-full flex-col px-4">
-      <div className="mb-4 space-y-2">
-        <Input value={to} onChange={setTo} placeholder="To" />
-        <Input value={subject} onChange={setSubject} placeholder="Subject" />
+    <div class="flex h-full flex-col px-4">
+      <div class="mb-4 space-y-2">
+        <Input value={to()} onChange={setTo} placeholder="To" />
+        <Input value={subject()} onChange={setSubject} placeholder="Subject" />
         <textarea
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
+          value={body()}
+          onInput={(e) => setBody(e.currentTarget.value)}
           placeholder="Message"
-          className="h-24 w-full resize-none rounded-2xl border border-border bg-surface-2 p-3 text-sm text-text outline-none placeholder:text-muted focus:border-primary"
+          class="h-24 w-full resize-none rounded-2xl border border-border bg-surface-2 p-3 text-sm text-text outline-none placeholder:text-muted focus:border-primary"
         />
-        <Button onClick={send} className="w-full">
-          <Send className="mr-2 h-4 w-4" />
+        <Button onClick={send} class="w-full">
+          <span class="i-mdi-send mr-2 h-4 w-4" />
           Save draft
         </Button>
       </div>
-      <div className="space-y-2">
-        {drafts.length === 0 && <p className="text-center text-sm text-text-secondary"><Inbox className="mx-auto mb-1 h-5 w-5" /> No drafts yet</p>}
-        {drafts.map((d) => (
-          <div key={d.id} className="rounded-2xl bg-surface-2 p-3">
-            <div className="mb-1 flex items-center justify-between">
-              <span className="text-sm font-semibold text-text">{d.subject}</span>
-              <button onClick={() => remove(d.id)} className="text-text-secondary hover:text-rose-400">
-                <Trash2 className="h-4 w-4" />
-              </button>
+      <div class="space-y-2">
+        {drafts().length === 0 && (
+          <p class="text-center text-sm text-text-secondary">
+            <span class="i-mdi-email mx-auto mb-1 h-5 w-5" /> No drafts yet
+          </p>
+        )}
+        <For each={drafts()}>
+          {(d) => (
+            <div class="rounded-2xl bg-surface-2 p-3">
+              <div class="mb-1 flex items-center justify-between">
+                <span class="text-sm font-semibold text-text">{d.subject}</span>
+                <button onClick={() => remove(d.id)} class="text-text-secondary hover:text-rose-400">
+                  <span class="i-mdi-delete h-4 w-4" />
+                </button>
+              </div>
+              <p class="text-xs text-text-secondary">To: {d.to}</p>
+              <p class="mt-1 text-xs text-muted line-clamp-2">{d.body}</p>
             </div>
-            <p className="text-xs text-text-secondary">To: {d.to}</p>
-            <p className="mt-1 text-xs text-muted line-clamp-2">{d.body}</p>
-          </div>
-        ))}
+          )}
+        </For>
       </div>
     </div>
   );

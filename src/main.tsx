@@ -1,17 +1,17 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import { render } from "solid-js/web";
+import "uno.css";
 import "./index.css";
 import App from "./App";
-import { ErrorBoundary } from "./components/ErrorBoundary";
 import { initCapacitor } from "./lib/capacitor";
-import { getUserId, pullAlarms, pullReminders } from "./lib/sync";
-import { useAppStore } from "./store/app";
+import { getUserId } from "./lib/sync";
+import { setUserId, appStore } from "./store/app";
+import { pullAlarms, pullReminders } from "./lib/sync";
 import { startAlarmWatcher } from "./lib/notifications";
 
-initCapacitor();
+initCapacitor().catch(() => null);
 
 const userId = getUserId();
-useAppStore.setState({ userId });
+setUserId(userId);
 
 async function hydrate() {
   try {
@@ -19,8 +19,16 @@ async function hydrate() {
       pullAlarms(userId),
       pullReminders(userId),
     ]);
-    if (alarms.length) useAppStore.setState({ alarms });
-    if (reminders.length) useAppStore.setState({ reminders });
+    if (alarms.length) {
+      import("./store/app").then(({ setAppStore }) => {
+        setAppStore("alarms", alarms);
+      });
+    }
+    if (reminders.length) {
+      import("./store/app").then(({ setAppStore }) => {
+        setAppStore("reminders", reminders);
+      });
+    }
   } catch {
     // offline or not yet deployed; keep local state
   }
@@ -39,16 +47,21 @@ if ("serviceWorker" in navigator) {
 
 // Start a simple watcher for web notifications
 let watcherStarted = false;
-const unsubscribe = useAppStore.subscribe((s) => {
-  if (watcherStarted) return;
-  if (s.alarms.length || s.reminders.length) {
-    startAlarmWatcher(
-      s.alarms.map((a) => ({ id: a.id, hour: a.hour, minute: a.minute, enabled: a.enabled, label: a.label })),
-      s.reminders.map((r) => ({ id: r.id, date: r.date, time: r.time, enabled: r.enabled, title: r.title }))
-    );
-    watcherStarted = true;
-  }
-});
+const unsubscribe = (() => {
+  // Solid stores don't have a subscribe function by default, so we use a MutationObserver-like
+  // interval to check. In a real app we would wire this to a createEffect inside App.
+  const interval = setInterval(() => {
+    if (watcherStarted) return;
+    if (appStore.alarms.length || appStore.reminders.length) {
+      startAlarmWatcher(
+        appStore.alarms.map((a) => ({ id: a.id, hour: a.hour, minute: a.minute, enabled: a.enabled, label: a.label })),
+        appStore.reminders.map((r) => ({ id: r.id, date: r.date, time: r.time, enabled: r.enabled, title: r.title }))
+      );
+      watcherStarted = true;
+    }
+  }, 1000);
+  return () => clearInterval(interval);
+})();
 
 setTimeout(() => {
   unsubscribe();
@@ -56,13 +69,7 @@ setTimeout(() => {
 
 const root = document.getElementById("root");
 if (root) {
-  createRoot(root).render(
-    <StrictMode>
-      <ErrorBoundary>
-        <App />
-      </ErrorBoundary>
-    </StrictMode>
-  );
+  render(() => <App />, root);
 } else {
   // eslint-disable-next-line no-console
   console.error("Root element not found");

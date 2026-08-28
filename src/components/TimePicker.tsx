@@ -8,36 +8,36 @@ function pad(n: number) {
   return n.toString().padStart(2, "0");
 }
 
-export function TimePicker({ hour, minute, onChange }: PickerProps) {
+export function TimePicker(props: PickerProps) {
   return (
-    <div className="flex items-center justify-center gap-4 rounded-3xl bg-surface-2 p-6">
-      <div className="flex flex-col items-center gap-2">
+    <div class="flex items-center justify-center gap-4 rounded-3xl bg-surface-2 p-6">
+      <div class="flex flex-col items-center gap-2">
         <button
-          onClick={() => onChange((hour + 1) % 24, minute)}
-          className="rounded-xl bg-surface-3 p-3 text-text-secondary hover:text-text"
+          onClick={() => props.onChange((props.hour + 1) % 24, props.minute)}
+          class="rounded-xl bg-surface-3 p-3 text-text-secondary hover:text-text"
         >
           ▲
         </button>
-        <div className="text-6xl font-bold tabular-nums text-glow">{pad(hour)}</div>
+        <div class="text-6xl font-bold tabular-nums text-glow">{pad(props.hour)}</div>
         <button
-          onClick={() => onChange((hour + 23) % 24, minute)}
-          className="rounded-xl bg-surface-3 p-3 text-text-secondary hover:text-text"
+          onClick={() => props.onChange((props.hour + 23) % 24, props.minute)}
+          class="rounded-xl bg-surface-3 p-3 text-text-secondary hover:text-text"
         >
           ▼
         </button>
       </div>
-      <span className="pb-2 text-5xl font-light text-muted">:</span>
-      <div className="flex flex-col items-center gap-2">
+      <span class="pb-2 text-5xl font-light text-muted">:</span>
+      <div class="flex flex-col items-center gap-2">
         <button
-          onClick={() => onChange(hour, (minute + 1) % 60)}
-          className="rounded-xl bg-surface-3 p-3 text-text-secondary hover:text-text"
+          onClick={() => props.onChange(props.hour, (props.minute + 1) % 60)}
+          class="rounded-xl bg-surface-3 p-3 text-text-secondary hover:text-text"
         >
           ▲
         </button>
-        <div className="text-6xl font-bold tabular-nums text-glow">{pad(minute)}</div>
+        <div class="text-6xl font-bold tabular-nums text-glow">{pad(props.minute)}</div>
         <button
-          onClick={() => onChange(hour, (minute + 59) % 60)}
-          className="rounded-xl bg-surface-3 p-3 text-text-secondary hover:text-text"
+          onClick={() => props.onChange(props.hour, (props.minute + 59) % 60)}
+          class="rounded-xl bg-surface-3 p-3 text-text-secondary hover:text-text"
         >
           ▼
         </button>

@@ -1,34 +1,36 @@
-import { useState, useEffect } from "react";
+import { createSignal, createEffect, onCleanup } from "solid-js";
 import { haptic } from "../lib/capacitor";
 import { showStatus } from "../lib/status";
 
 export function NotesTab() {
-  const [note, setNote] = useState(localStorage.getItem("newkub-mobile-note") ?? "");
+  const [note, setNote] = createSignal(localStorage.getItem("newkub-mobile-note") ?? "");
 
-  useEffect(() => {
-    const t = setTimeout(() => {
-      localStorage.setItem("newkub-mobile-note", note);
+  createEffect(() => {
+    const value = note();
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    timeout = setTimeout(() => {
+      localStorage.setItem("newkub-mobile-note", value);
     }, 500);
-    return () => clearTimeout(t);
-  }, [note]);
+    onCleanup(() => clearTimeout(timeout));
+  });
 
   function save() {
     haptic("success");
-    localStorage.setItem("newkub-mobile-note", note);
+    localStorage.setItem("newkub-mobile-note", note());
     showStatus("Note saved", "success");
   }
 
   return (
-    <div className="flex h-full flex-col px-4">
+    <div class="flex h-full flex-col px-4">
       <textarea
-        value={note}
-        onChange={(e) => setNote(e.target.value)}
+        value={note()}
+        onInput={(e) => setNote(e.currentTarget.value)}
         placeholder="Write a quick note..."
-        className="flex-1 w-full resize-none rounded-2xl border border-border bg-surface-2 p-4 text-sm text-text outline-none placeholder:text-muted focus:border-primary"
+        class="flex-1 w-full resize-none rounded-2xl border border-border bg-surface-2 p-4 text-sm text-text outline-none placeholder:text-muted focus:border-primary"
       />
       <button
         onClick={save}
-        className="mt-3 w-full rounded-2xl bg-primary py-3 font-medium text-white transition active:scale-95"
+        class="mt-3 w-full rounded-2xl bg-primary py-3 font-medium text-white transition active:scale-95"
       >
         Save note
       </button>

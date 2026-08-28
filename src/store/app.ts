@@ -1,5 +1,4 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createStore, produce } from "solid-js/store";
 import { deleteAlarm, deleteReminder, pushAlarm, pushReminder } from "../lib/sync";
 import type { Alarm, PomodoroSession, Reminder, TimerPreset } from "../types";
 
@@ -39,15 +38,17 @@ export interface StatusMessage {
   type: "info" | "success" | "warning" | "error";
 }
 
+const STORAGE_KEY = "newkub-mobile-store";
+
 const defaultTabs: TabDefinition[] = [
-  { id: "home", label: "Home", icon: "Home", visible: true, type: "home" },
-  { id: "clock", label: "Clock", icon: "Clock", visible: true, type: "clock" },
-  { id: "task", label: "Task", icon: "CheckCircle2", visible: true, type: "task" },
-  { id: "devin", label: "Devin", icon: "Bot", visible: true, type: "devin" },
-  { id: "notes", label: "Notes", icon: "StickyNote", visible: true, type: "notes" },
-  { id: "saved", label: "Saved", icon: "Bookmark", visible: true, type: "saved" },
-  { id: "email", label: "Email", icon: "Mail", visible: true, type: "email" },
-  { id: "agent", label: "New Tab", icon: "Sparkles", visible: true, type: "agent" },
+  { id: "home", label: "Home", icon: "i-mdi-home", visible: true, type: "home" },
+  { id: "clock", label: "Clock", icon: "i-mdi-clock", visible: true, type: "clock" },
+  { id: "task", label: "Task", icon: "i-mdi-check-circle", visible: true, type: "task" },
+  { id: "devin", label: "Devin", icon: "i-mdi-robot", visible: true, type: "devin" },
+  { id: "notes", label: "Notes", icon: "i-mdi-note", visible: true, type: "notes" },
+  { id: "saved", label: "Saved", icon: "i-mdi-bookmark", visible: true, type: "saved" },
+  { id: "email", label: "Email", icon: "i-mdi-email", visible: true, type: "email" },
+  { id: "agent", label: "New Tab", icon: "i-mdi-sparkles", visible: true, type: "agent" },
 ];
 
 const defaultGlobal: GlobalSettings = {
@@ -59,63 +60,6 @@ const defaultGlobal: GlobalSettings = {
   customLogo: "default",
 };
 
-export interface AppState {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
-  lastVisitedTab: string;
-
-  clockSubTab: string;
-  setClockSubTab: (tab: string) => void;
-
-  tabs: TabDefinition[];
-  addTab: (tab: TabDefinition) => void;
-  removeTab: (id: string) => void;
-  updateTab: (id: string, patch: Partial<TabDefinition>) => void;
-
-  homeWidgets: HomeWidget[];
-  setHomeWidgets: (widgets: HomeWidget[]) => void;
-  addHomeWidget: (widget: HomeWidget) => void;
-  removeHomeWidget: (id: string) => void;
-
-  globalSettings: GlobalSettings;
-  setGlobalSetting: <K extends keyof GlobalSettings>(key: K, value: GlobalSettings[K]) => void;
-
-  tabSettings: Record<string, Record<string, unknown>>;
-  setTabSetting: (tabId: string, key: string, value: unknown) => void;
-
-  status: StatusMessage | null;
-  setStatus: (status: StatusMessage) => void;
-  clearStatus: () => void;
-
-  userId: string;
-  setUserId: (id: string) => void;
-
-  alarms: Alarm[];
-  addAlarm: (alarm: Alarm) => void;
-  updateAlarm: (id: string, patch: Partial<Alarm>) => void;
-  removeAlarm: (id: string) => void;
-  toggleAlarm: (id: string) => void;
-
-  timerPresets: TimerPreset[];
-  addTimerPreset: (preset: TimerPreset) => void;
-  removeTimerPreset: (id: string) => void;
-
-  reminders: Reminder[];
-  addReminder: (r: Reminder) => void;
-  updateReminder: (id: string, patch: Partial<Reminder>) => void;
-  removeReminder: (id: string) => void;
-  toggleReminder: (id: string) => void;
-
-  pomodoroSessions: PomodoroSession[];
-  addPomodoroSession: (s: PomodoroSession) => void;
-
-  elevenLabsKey: string;
-  setElevenLabsKey: (key: string) => void;
-
-  firstVisit: boolean;
-  setFirstVisit: (v: boolean) => void;
-}
-
 const defaultPresets: TimerPreset[] = [
   { id: "p1", name: "3 min", seconds: 180, color: "#22c55e" },
   { id: "p2", name: "5 min", seconds: 300, color: "#3b82f6" },
@@ -124,147 +68,263 @@ const defaultPresets: TimerPreset[] = [
   { id: "p5", name: "25 min", seconds: 1500, color: "#6366f1" },
 ];
 
-export const useAppStore = create<AppState>()(
-  persist(
-    (set) => ({
-      activeTab: "home",
-      setActiveTab: (tab) =>
-        set(() => ({
-          activeTab: tab,
-          lastVisitedTab: tab,
-        })),
-      lastVisitedTab: "home",
+export interface AppState {
+  activeTab: string;
+  lastVisitedTab: string;
+  clockSubTab: string;
+  tabs: TabDefinition[];
+  homeWidgets: HomeWidget[];
+  globalSettings: GlobalSettings;
+  tabSettings: Record<string, Record<string, unknown>>;
+  status: StatusMessage | null;
+  userId: string;
+  alarms: Alarm[];
+  timerPresets: TimerPreset[];
+  reminders: Reminder[];
+  pomodoroSessions: PomodoroSession[];
+  elevenLabsKey: string;
+  firstVisit: boolean;
+  settingsOpen: boolean;
+}
 
-      clockSubTab: "alarm",
-      setClockSubTab: (tab) => set({ clockSubTab: tab }),
+const initialState: AppState = {
+  activeTab: "home",
+  lastVisitedTab: "home",
+  clockSubTab: "alarm",
+  tabs: defaultTabs,
+  homeWidgets: [],
+  globalSettings: defaultGlobal,
+  tabSettings: {},
+  status: null,
+  userId: "",
+  alarms: [],
+  timerPresets: defaultPresets,
+  reminders: [],
+  pomodoroSessions: [],
+  elevenLabsKey: "",
+  firstVisit: true,
+  settingsOpen: false,
+};
 
-      tabs: defaultTabs,
-      addTab: (tab) =>
-        set((s) => ({ tabs: [...s.tabs, tab] })),
-      removeTab: (id) =>
-        set((s) => {
-          if (["home", "clock"].includes(id)) return s;
-          const next = s.tabs.filter((t) => t.id !== id);
-          return { tabs: next };
-        }),
-      updateTab: (id, patch) =>
-        set((s) => ({
-          tabs: s.tabs.map((t) => (t.id === id ? { ...t, ...patch } : t)),
-        })),
+function loadState(): Partial<AppState> {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as Partial<AppState>;
+    // ensure default tabs are not completely overwritten by malformed data
+    if (!Array.isArray(parsed.tabs) || parsed.tabs.length === 0) {
+      parsed.tabs = defaultTabs;
+    }
+    return parsed;
+  } catch {
+    return {};
+  }
+}
 
-      homeWidgets: [],
-      setHomeWidgets: (widgets) => set({ homeWidgets: widgets }),
-      addHomeWidget: (widget) =>
-        set((s) => ({ homeWidgets: [...s.homeWidgets, widget] })),
-      removeHomeWidget: (id) =>
-        set((s) => ({ homeWidgets: s.homeWidgets.filter((w) => w.id !== id) })),
+function mergeWithDefault(loaded: Partial<AppState>): AppState {
+  return {
+    ...initialState,
+    ...loaded,
+    globalSettings: { ...defaultGlobal, ...loaded.globalSettings },
+    tabSettings: loaded.tabSettings ?? {},
+  };
+}
 
-      globalSettings: defaultGlobal,
-      setGlobalSetting: (key, value) =>
-        set((s) => ({
-          globalSettings: { ...s.globalSettings, [key]: value },
-        })),
+const [store, setStore] = createStore<AppState>(mergeWithDefault(loadState()));
 
-      tabSettings: {},
-      setTabSetting: (tabId, key, value) =>
-        set((s) => ({
-          tabSettings: {
-            ...s.tabSettings,
-            [tabId]: { ...(s.tabSettings[tabId] ?? {}), [key]: value },
-          },
-        })),
+function persist() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+  } catch {
+    // ignore
+  }
+}
 
-      status: null,
-      setStatus: (status) => set({ status }),
-      clearStatus: () => set({ status: null }),
+// Persist on every change in a non-blocking way
+let persistTimer: ReturnType<typeof setTimeout> | null = null;
+export function queuePersist() {
+  if (persistTimer) clearTimeout(persistTimer);
+  persistTimer = setTimeout(persist, 200);
+}
 
-      userId: "",
-      setUserId: (id) => set({ userId: id }),
+export { store as appStore, setStore as setAppStore };
 
-      alarms: [],
-      addAlarm: (alarm) =>
-        set((s) => {
-          if (s.userId) pushAlarm(s.userId, alarm).catch(() => null);
-          return { alarms: [...s.alarms, alarm] };
-        }),
-      updateAlarm: (id, patch) =>
-        set((s) => {
-          const next = s.alarms.map((a) => (a.id === id ? { ...a, ...patch } : a));
-          const updated = next.find((a) => a.id === id);
-          if (updated && s.userId) pushAlarm(s.userId, updated).catch(() => null);
-          return { alarms: next };
-        }),
-      removeAlarm: (id) =>
-        set((s) => {
-          if (s.userId) deleteAlarm(s.userId, id).catch(() => null);
-          return { alarms: s.alarms.filter((a) => a.id !== id) };
-        }),
-      toggleAlarm: (id) =>
-        set((s) => {
-          const next = s.alarms.map((a) => (a.id === id ? { ...a, enabled: !a.enabled } : a));
-          const updated = next.find((a) => a.id === id);
-          if (updated && s.userId) pushAlarm(s.userId, updated).catch(() => null);
-          return { alarms: next };
-        }),
+// Actions
+export function setActiveTab(tab: string) {
+  setStore("activeTab", tab);
+  setStore("lastVisitedTab", tab);
+  queuePersist();
+}
 
-      timerPresets: defaultPresets,
-      addTimerPreset: (preset) =>
-        set((s) => ({ timerPresets: [...s.timerPresets, preset] })),
-      removeTimerPreset: (id) =>
-        set((s) => ({ timerPresets: s.timerPresets.filter((p) => p.id !== id) })),
+export function setClockSubTab(tab: string) {
+  setStore("clockSubTab", tab);
+  queuePersist();
+}
 
-      reminders: [],
-      addReminder: (r) =>
-        set((s) => {
-          if (s.userId) pushReminder(s.userId, r).catch(() => null);
-          return { reminders: [...s.reminders, r] };
-        }),
-      updateReminder: (id, patch) =>
-        set((s) => {
-          const next = s.reminders.map((r) => (r.id === id ? { ...r, ...patch } : r));
-          const updated = next.find((r) => r.id === id);
-          if (updated && s.userId) pushReminder(s.userId, updated).catch(() => null);
-          return { reminders: next };
-        }),
-      removeReminder: (id) =>
-        set((s) => {
-          if (s.userId) deleteReminder(s.userId, id).catch(() => null);
-          return { reminders: s.reminders.filter((r) => r.id !== id) };
-        }),
-      toggleReminder: (id) =>
-        set((s) => {
-          const next = s.reminders.map((r) => (r.id === id ? { ...r, enabled: !r.enabled } : r));
-          const updated = next.find((r) => r.id === id);
-          if (updated && s.userId) pushReminder(s.userId, updated).catch(() => null);
-          return { reminders: next };
-        }),
+export function addTab(tab: TabDefinition) {
+  setStore(produce((s) => { s.tabs.push(tab); }));
+  queuePersist();
+}
 
-      pomodoroSessions: [],
-      addPomodoroSession: (session) =>
-        set((s) => {
-          const existing = s.pomodoroSessions.find((x) => x.date === session.date);
-          if (existing) {
-            return {
-              pomodoroSessions: s.pomodoroSessions.map((x) =>
-                x.date === session.date
-                  ? {
-                    ...x,
-                    completedCycles: x.completedCycles + session.completedCycles,
-                    totalFocusSeconds: x.totalFocusSeconds + session.totalFocusSeconds,
-                  }
-                  : x
-              ),
-            };
-          }
-          return { pomodoroSessions: [...s.pomodoroSessions, session] };
-        }),
+export function removeTab(id: string) {
+  if (["home", "clock"].includes(id)) return;
+  setStore(produce((s) => { s.tabs = s.tabs.filter((t) => t.id !== id); }));
+  queuePersist();
+}
 
-      elevenLabsKey: "",
-      setElevenLabsKey: (key) => set({ elevenLabsKey: key }),
+export function updateTab(id: string, patch: Partial<TabDefinition>) {
+  setStore(
+    "tabs",
+    (tabs) => tabs.map((t) => (t.id === id ? { ...t, ...patch } as TabDefinition : t))
+  );
+  queuePersist();
+}
 
-      firstVisit: true,
-      setFirstVisit: (v) => set({ firstVisit: v }),
-    }),
-    { name: "newkub-mobile-store" }
-  )
-);
+export function setHomeWidgets(widgets: HomeWidget[]) {
+  setStore("homeWidgets", widgets);
+  queuePersist();
+}
+
+export function addHomeWidget(widget: HomeWidget) {
+  setStore(produce((s) => { s.homeWidgets.push(widget); }));
+  queuePersist();
+}
+
+export function removeHomeWidget(id: string) {
+  setStore(
+    "homeWidgets",
+    (widgets) => widgets.filter((w) => w.id !== id)
+  );
+  queuePersist();
+}
+
+export function setGlobalSetting<K extends keyof GlobalSettings>(key: K, value: GlobalSettings[K]) {
+  setStore("globalSettings", key, value);
+  queuePersist();
+}
+
+export function setTabSetting(tabId: string, key: string, value: unknown) {
+  setStore(produce((s) => {
+    s.tabSettings[tabId] = s.tabSettings[tabId] ?? {};
+    s.tabSettings[tabId][key] = value;
+  }));
+  queuePersist();
+}
+
+export function setStatus(status: StatusMessage) {
+  setStore("status", status);
+  if (status.type !== "error") {
+    setTimeout(() => setStore("status", null), 3000);
+  }
+}
+
+export function clearStatus() {
+  setStore("status", null);
+}
+
+export function setUserId(id: string) {
+  setStore("userId", id);
+  queuePersist();
+}
+
+export function addAlarm(alarm: Alarm) {
+  setStore(produce((s) => { s.alarms.push(alarm); }));
+  if (store.userId) pushAlarm(store.userId, alarm).catch(() => null);
+  queuePersist();
+}
+
+export function updateAlarm(id: string, patch: Partial<Alarm>) {
+  setStore(
+    "alarms",
+    (alarms) => alarms.map((a) => (a.id === id ? { ...a, ...patch } as Alarm : a))
+  );
+  const updated = store.alarms.find((a) => a.id === id);
+  if (updated && store.userId) pushAlarm(store.userId, updated).catch(() => null);
+  queuePersist();
+}
+
+export function removeAlarm(id: string) {
+  setStore("alarms", (alarms) => alarms.filter((a) => a.id !== id));
+  if (store.userId) deleteAlarm(store.userId, id).catch(() => null);
+  queuePersist();
+}
+
+export function toggleAlarm(id: string) {
+  const alarm = store.alarms.find((a) => a.id === id);
+  if (!alarm) return;
+  updateAlarm(id, { enabled: !alarm.enabled });
+}
+
+export function addTimerPreset(preset: TimerPreset) {
+  setStore(produce((s) => { s.timerPresets.push(preset); }));
+  queuePersist();
+}
+
+export function removeTimerPreset(id: string) {
+  setStore("timerPresets", (presets) => presets.filter((p) => p.id !== id));
+  queuePersist();
+}
+
+export function addReminder(r: Reminder) {
+  setStore(produce((s) => { s.reminders.push(r); }));
+  if (store.userId) pushReminder(store.userId, r).catch(() => null);
+  queuePersist();
+}
+
+export function updateReminder(id: string, patch: Partial<Reminder>) {
+  setStore(
+    "reminders",
+    (reminders) => reminders.map((r) => (r.id === id ? { ...r, ...patch } as Reminder : r))
+  );
+  const updated = store.reminders.find((r) => r.id === id);
+  if (updated && store.userId) pushReminder(store.userId, updated).catch(() => null);
+  queuePersist();
+}
+
+export function removeReminder(id: string) {
+  setStore("reminders", (reminders) => reminders.filter((r) => r.id !== id));
+  if (store.userId) deleteReminder(store.userId, id).catch(() => null);
+  queuePersist();
+}
+
+export function toggleReminder(id: string) {
+  const r = store.reminders.find((x) => x.id === id);
+  if (!r) return;
+  updateReminder(id, { enabled: !r.enabled });
+}
+
+export function addPomodoroSession(session: PomodoroSession) {
+  setStore(produce((s) => {
+    const existing = s.pomodoroSessions.find((x) => x.date === session.date);
+    if (existing) {
+      existing.completedCycles += session.completedCycles;
+      existing.totalFocusSeconds += session.totalFocusSeconds;
+    } else {
+      s.pomodoroSessions.push(session);
+    }
+  }));
+  queuePersist();
+}
+
+export function setElevenLabsKey(key: string) {
+  setStore("elevenLabsKey", key);
+  queuePersist();
+}
+
+export function setFirstVisit(v: boolean) {
+  setStore("firstVisit", v);
+  queuePersist();
+}
+
+export function openSettings() {
+  setStore("settingsOpen", true);
+}
+
+export function closeSettings() {
+  setStore("settingsOpen", false);
+}
+
+export function resetStore() {
+  setStore(initialState);
+  queuePersist();
+}
