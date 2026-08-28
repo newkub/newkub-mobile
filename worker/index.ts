@@ -51,6 +51,7 @@ export default {
       // Static assets with cache-busting headers
       const assetRes = await env.ASSETS.fetch(request);
       const headers = new Headers(assetRes.headers);
+      headers.set("X-Worker-Version", "2");
 
       if (url.pathname === "/" || url.pathname === "/index.html") {
         headers.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
