@@ -1,9 +1,11 @@
-import { createSignal, For } from "solid-js";
+import { createSignal, For, onMount, Show } from "solid-js";
 import { Input } from "../components/Input";
 import { Button } from "../components/Button";
+import { EmptyState } from "../components/EmptyState";
 import { haptic } from "../lib/capacitor";
 import { showStatus } from "../lib/status";
 import { generateUUID } from "../lib/uuid";
+import { get, set } from "../lib/storage";
 
 interface SavedItem {
   id: string;
@@ -11,23 +13,54 @@ interface SavedItem {
   url: string;
 }
 
+const SAVED_KEY = "newkub-mobile-saved";
+
 export function SavedTab() {
   const [items, setItems] = createSignal<SavedItem[]>([]);
+  const [loading, setLoading] = createSignal(true);
   const [title, setTitle] = createSignal("");
   const [url, setUrl] = createSignal("");
 
-  function add() {
+  onMount(async () => {
+    const saved = (await get<SavedItem[]>(SAVED_KEY, [])) ?? [];
+    setItems(saved);
+    setLoading(false);
+  });
+
+  async function persist(next: SavedItem[]) {
+    setItems(next);
+    try {
+      await set(SAVED_KEY, next);
+    } catch {
+      // ignore
+    }
+  }
+
+  function isValidUrl(value: string): boolean {
+    try {
+      new URL(value);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async function add() {
     if (!title().trim() || !url().trim()) return;
+    if (!isValidUrl(url())) {
+      showStatus("Please enter a valid URL", "error");
+      return;
+    }
     haptic("success");
-    setItems([...items(), { id: generateUUID(), title: title(), url: url() }]);
+    await persist([...items(), { id: generateUUID(), title: title(), url: url() }]);
     setTitle("");
     setUrl("");
     showStatus("Saved item added", "success");
   }
 
-  function remove(id: string) {
+  async function remove(id: string) {
     haptic("light");
-    setItems(items().filter((i) => i.id !== id));
+    await persist(items().filter((i) => i.id !== id));
     showStatus("Removed", "info");
   }
 
@@ -42,8 +75,24 @@ export function SavedTab() {
           </Button>
         </div>
       </div>
+
+      <Show when={loading()}>
+        <div class="space-y-2">
+          <For each={[1, 2, 3]}>
+            {() => <div class="h-14 animate-pulse rounded-2xl bg-surface-2" />}
+          </For>
+        </div>
+      </Show>
+
+      <Show when={!loading() && items().length === 0}>
+        <EmptyState
+          icon="i-mdi-bookmark"
+          title="No saved links yet"
+          subtitle="Save your favorite links here"
+        />
+      </Show>
+
       <div class="space-y-2">
-        {items().length === 0 && <p class="text-center text-sm text-text-secondary">No saved links yet</p>}
         <For each={items()}>
           {(i) => (
             <div class="flex items-center gap-3 rounded-2xl bg-surface-2 p-3">

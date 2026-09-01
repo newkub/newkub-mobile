@@ -1,9 +1,11 @@
-import { createSignal, For } from "solid-js";
+import { createSignal, For, onMount, Show } from "solid-js";
 import { Input } from "../components/Input";
 import { Button } from "../components/Button";
+import { EmptyState } from "../components/EmptyState";
 import { haptic } from "../lib/capacitor";
 import { showStatus } from "../lib/status";
 import { generateUUID } from "../lib/uuid";
+import { get, set } from "../lib/storage";
 
 interface Draft {
   id: string;
@@ -12,26 +14,47 @@ interface Draft {
   body: string;
 }
 
+const DRAFTS_KEY = "newkub-mobile-drafts";
+
 export function EmailTab() {
   const [drafts, setDrafts] = createSignal<Draft[]>([]);
+  const [loading, setLoading] = createSignal(true);
   const [to, setTo] = createSignal("");
   const [subject, setSubject] = createSignal("");
   const [body, setBody] = createSignal("");
 
-  function send() {
-    if (!to().trim() || !subject().trim()) return;
+  onMount(async () => {
+    const saved = (await get<Draft[]>(DRAFTS_KEY, [])) ?? [];
+    setDrafts(saved);
+    setLoading(false);
+  });
+
+  async function persist(next: Draft[]) {
+    setDrafts(next);
+    try {
+      await set(DRAFTS_KEY, next);
+    } catch {
+      // ignore
+    }
+  }
+
+  async function send() {
+    if (!to().trim() || !subject().trim()) {
+      showStatus("To and subject are required", "warning");
+      return;
+    }
     haptic("success");
     const draft: Draft = { id: generateUUID(), to: to(), subject: subject(), body: body() };
-    setDrafts([draft, ...drafts()]);
+    await persist([draft, ...drafts()]);
     setTo("");
     setSubject("");
     setBody("");
     showStatus("Email draft saved", "success");
   }
 
-  function remove(id: string) {
+  async function remove(id: string) {
     haptic("light");
-    setDrafts(drafts().filter((d) => d.id !== id));
+    await persist(drafts().filter((d) => d.id !== id));
     showStatus("Draft removed", "info");
   }
 
@@ -51,12 +74,24 @@ export function EmailTab() {
           Save draft
         </Button>
       </div>
-      <div class="space-y-2">
-        {drafts().length === 0 && (
-          <p class="text-center text-sm text-text-secondary">
-            <span class="i-mdi-email mx-auto mb-1 h-5 w-5" /> No drafts yet
-          </p>
-        )}
+
+      <Show when={loading()}>
+        <div class="space-y-2">
+          <For each={[1, 2, 3]}>
+            {() => <div class="h-20 animate-pulse rounded-2xl bg-surface-2" />}
+          </For>
+        </div>
+      </Show>
+
+      <Show when={!loading() && drafts().length === 0}>
+        <EmptyState
+          icon="i-mdi-email"
+          title="No drafts yet"
+          subtitle="Create an email draft to save it here"
+        />
+      </Show>
+
+      <div class="space-y-2 overflow-y-auto">
         <For each={drafts()}>
           {(d) => (
             <div class="rounded-2xl bg-surface-2 p-3">

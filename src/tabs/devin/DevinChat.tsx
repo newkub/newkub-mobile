@@ -10,18 +10,12 @@ import {
 } from "../../lib/devin";
 import { showStatus } from "../../lib/status";
 import { haptic } from "../../lib/capacitor";
-import { Button } from "../../components/Button";
-import { Input } from "../../components/Input";
+import { DevinMessageBubble } from "./DevinMessageBubble";
+import { DevinChatInput } from "./DevinChatInput";
 import { DevinQuestionCard } from "./DevinQuestionCard";
 import type { DevinMessage, DevinSession, DevinStatusDetail } from "../../types";
-import { appStore } from "../../store/app";
+import { appStore, setActiveDevinSessionId } from "../../store/app";
 import { showLocalNotification } from "../../lib/notifications";
-
-function formatTime(ts?: number): string {
-  if (!ts) return "";
-  const d = new Date(ts * 1000);
-  return d.toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit" });
-}
 
 export function DevinChat(props: {
   session: DevinSession;
@@ -30,8 +24,8 @@ export function DevinChat(props: {
 }) {
   const [session, setSession] = createSignal<DevinSession>(props.session);
   const [messages, setMessages] = createSignal<DevinMessage[]>([]);
-  const [input, setInput] = createSignal("");
   const [loading, setLoading] = createSignal(false);
+  const [sending, setSending] = createSignal(false);
   const [waiting, setWaiting] = createSignal<DevinStatusDetail | null>(null);
   const [error, setError] = createSignal<string | null>(null);
 
@@ -58,6 +52,7 @@ export function DevinChat(props: {
   }
 
   onMount(() => {
+    setActiveDevinSessionId(props.session.session_id);
     loadInitial();
     pollDevinSession(
       props.session.session_id,
@@ -92,26 +87,28 @@ export function DevinChat(props: {
     );
   });
 
-  onCleanup(() => controller.abort());
+  onCleanup(() => {
+    controller.abort();
+    setActiveDevinSessionId(null);
+  });
 
   createEffect(() => {
     if (scrollRef) scrollRef.scrollTop = scrollRef.scrollHeight;
   });
 
-  async function send(text: string) {
-    if (!text.trim() || loading()) return;
+  async function send(text: string, attachmentUrls: string[] = []) {
+    if ((!text.trim() && !attachmentUrls.length) || sending()) return;
     haptic("light");
-    setLoading(true);
+    setSending(true);
     try {
-      await sendDevinMessage(session().session_id, text);
-      setInput("");
+      await sendDevinMessage(session().session_id, text, attachmentUrls);
       setWaiting(null);
       const { messages: list } = await listDevinMessages(session().session_id, 100);
       setMessages(list);
     } catch (err) {
       showStatus(err instanceof Error ? err.message : "Failed to send", "error");
     } finally {
-      setLoading(false);
+      setSending(false);
     }
   }
 
@@ -212,49 +209,13 @@ export function DevinChat(props: {
         <Show when={loading() && messages().length === 0}>
           <div class="space-y-2 p-2">
             <For each={[1, 2, 3]}>
-              {() => (
-                <div class="h-16 animate-pulse rounded-2xl bg-surface-2" />
-              )}
+              {() => <div class="h-16 animate-pulse rounded-2xl bg-surface-2" />}
             </For>
           </div>
         </Show>
 
         <For each={messages()}>
-          {(msg) => {
-            const isUser = msg.role === "user";
-            return (
-              <div
-                class={`flex ${isUser ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  class={`max-w-[85%] rounded-2xl px-4 py-2 text-sm ${
-                    isUser
-                      ? "bg-primary text-white"
-                      : "bg-surface-2 text-text"
-                  }`}
-                >
-                  <p class="whitespace-pre-wrap">{msg.content}</p>
-                  {msg.attachments?.length ? (
-                    <div class="mt-2 space-y-1">
-                      {msg.attachments.map((a) => (
-                        <a
-                          href={a.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          class="block truncate text-xs underline opacity-80"
-                        >
-                          {a.url}
-                        </a>
-                      ))}
-                    </div>
-                  ) : null}
-                  <p class="mt-1 text-right text-[10px] opacity-70">
-                    {formatTime(msg.created_at)}
-                  </p>
-                </div>
-              </div>
-            );
-          }}
+          {(msg) => <DevinMessageBubble message={msg} />}
         </For>
       </div>
 
@@ -267,17 +228,7 @@ export function DevinChat(props: {
         </div>
       </Show>
 
-      <div class="mt-3 flex items-end gap-2 pb-2">
-        <Input
-          value={input()}
-          onChange={setInput}
-          placeholder="Type a message..."
-          class="flex-1"
-        />
-        <Button onClick={() => send(input())} disabled={loading()} size="md" class="shrink-0">
-          <span class="i-mdi-send h-5 w-5" />
-        </Button>
-      </div>
+      <DevinChatInput onSend={send} disabled={sending()} />
     </div>
   );
 }

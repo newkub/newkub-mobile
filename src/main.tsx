@@ -3,13 +3,23 @@ import "uno.css";
 import "./theme.css";
 import "./index.css";
 import App from "./App";
+import { App as CapApp } from "@capacitor/app";
 import { initCapacitor } from "./lib/capacitor";
 import { getUserId } from "./lib/sync";
 import { setUserId, appStore, setAppStore } from "./store/app";
 import { pullAlarms, pullReminders } from "./lib/sync";
-import { startAlarmWatcher } from "./lib/notifications";
+import { startAlarmWatcher, requestNotificationPermission } from "./lib/notifications";
+import { checkAndNotifyDevinSession } from "./lib/devin";
 
 initCapacitor().catch(() => null);
+
+requestNotificationPermission().catch(() => null);
+
+CapApp.addListener("appStateChange", ({ isActive }) => {
+  if (isActive && appStore.activeDevinSessionId) {
+    checkAndNotifyDevinSession(appStore.activeDevinSessionId);
+  }
+});
 
 const userId = getUserId();
 setUserId(userId);

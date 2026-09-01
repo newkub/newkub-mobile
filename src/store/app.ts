@@ -84,6 +84,7 @@ export interface AppState {
   pomodoroSessions: PomodoroSession[];
   elevenLabsKey: string;
   devinSettings: DevinSettings;
+  activeDevinSessionId: string | null;
   firstVisit: boolean;
   settingsOpen: boolean;
 }
@@ -110,6 +111,7 @@ const initialState: AppState = {
     notifyCompleted: true,
     notifyWaiting: true,
   },
+  activeDevinSessionId: null,
   firstVisit: true,
   settingsOpen: false,
 };
@@ -324,6 +326,11 @@ export function setDevinSettings(settings: Partial<DevinSettings>) {
     "devinSettings",
     (current) => ({ ...current, ...settings }) as DevinSettings,
   );
+  queuePersist();
+}
+
+export function setActiveDevinSessionId(id: string | null) {
+  setStore("activeDevinSessionId", id);
   queuePersist();
 }
 

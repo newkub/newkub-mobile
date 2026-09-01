@@ -78,7 +78,9 @@ export function StopwatchTab() {
         <CircleProgress progress={0} size={260} stroke={10}>
           <div class="text-center">
             <p class="text-6xl font-bold tabular-nums text-glow">{format(time())}</p>
-            <p class="mt-1 text-sm text-text-secondary">{laps().length} lap{laps().length !== 1 ? "s" : ""}</p>
+            <p class="mt-1 text-sm text-text-secondary">
+              {time() === 0 ? "Tap start to begin" : `${laps().length} lap${laps().length !== 1 ? "s" : ""}`}
+            </p>
           </div>
         </CircleProgress>
       </div>
