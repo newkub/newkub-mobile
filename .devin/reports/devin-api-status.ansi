@@ -1,0 +1,69 @@
+[1;34m╔══════════════════════════════════════════════════════════════╗[0m
+[1;34m║    Devin API Integration Status — newkub-mobile              ║[0m
+[1;34m╚══════════════════════════════════════════════════════════════╝[0m
+
+[1mSummary[0m
+  [1;32m● API available[0m        Devin v3 REST API
+  [1;32m● Project stack[0m        SolidJS + Capacitor + Cloudflare Workers
+  [1;33m○ Current Devin tab[0m    mock buttons only (no API calls)
+  [1;33m○ API key storage[0m      missing — needs settings + proxy
+
+[1;34m┌─ API Capability Check ──────────────────────────────────────┐[0m
+[1m  Endpoint                           Status          Note     [0m
+  POST /v3/organizations/{org}/sessions      [1;32mREADY[0m   create
+  GET  /v3/organizations/{org}/sessions/{id} [1;32mREADY[0m   status
+  GET  /v3/.../sessions/{id}/messages        [1;32mREADY[0m   poll
+  POST /v3/.../sessions/{id}/messages        [1;32mREADY[0m   reply
+  POST /v3/.../sessions/{id}/archive         [1;32mREADY[0m   archive
+  Webhook push from Devin                    [1;31mMISSING[0m must poll
+  Real-time SSE/WebSocket                    [1;31mMISSING[0m must poll
+
+[1;34m┌─ Mobile Flow (ANSI) ────────────────────────────────────────┐[0m
+[1m  User[0m
+    │
+    ▼
+  [1;36m┌──────────────┐[0m
+  [1;36m│  Devin Tab   │[0m
+  [1;36m└──────┬───────┘[0m
+         │
+    [Tap] New Session
+         │
+         ▼
+  [1;33mPOST /sessions[0m  ──►  [1;32msession_id[0m
+         │
+         ▼
+  [1;36m┌──────────────┐[0m
+  [1;36m│  Chat View   │[0m
+  [1;36m└──────┬───────┘[0m
+         │
+    poll messages/status
+         │
+    ┌────┴────┐
+    ▼         ▼
+ [1;33mrunning[0m  [1;33mwaiting_for_user[0m
+    │            │
+    ▼            ▼
+ update UI   show question
+    │         card
+    │            │
+    ▼            ▼
+  continue ◄── user reply
+    │
+    ▼
+ [1;32mexit[0m/[1;31merror[0m done
+
+[1;34m┌─ Feature Readiness ─────────────────────────────────────────┐[0m
+  [1;32m[OK][0m Session list + search
+  [1;32m[OK][0m New session composer
+  [1;32m[OK][0m Chat with polling
+  [1;32m[OK][0m Quick reply buttons
+  [1;33m[WARN][0m Attachments (needs upload flow)
+  [1;33m[WARN][0m Push notifications (needs background polling)
+  [1;31m[MISSING][0m Real-time streaming
+
+[1;34m┌─ Next Steps ────────────────────────────────────────────────┐[0m
+  1. [1;33mAdd /api/devin/* proxy in worker[0m
+  2. [1;33mCreate lib/devin.ts client[0m
+  3. [1;33mReplace tabs/Devin.tsx mock with live session UI[0m
+  4. [1;33mAdd settings screen for API/org[0m
+  5. [1;33mAdd notifications on status change[0m

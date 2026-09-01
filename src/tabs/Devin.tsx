@@ -1,121 +1,134 @@
-import { createSignal, For } from "solid-js";
-import { AiFixPanel } from "../components/AiFixPanel";
+import { createSignal, Show } from "solid-js";
+import { appStore, setDevinSettings } from "../store/app";
+import { Button } from "../components/Button";
+import { Input } from "../components/Input";
+import { Switch } from "../components/Switch";
 import { haptic } from "../lib/capacitor";
 import { showStatus } from "../lib/status";
-import { fetchWorkerStatus } from "../lib/cloudflare";
-import { fetchRepoStatus } from "../lib/github";
+import { DevinSessionList } from "./devin/DevinSessionList";
+import { DevinNewSession } from "./devin/DevinNewSession";
+import { DevinChat } from "./devin/DevinChat";
+import type { DevinSession } from "../types";
 
-const agents = [
-  { id: "devin", name: "Devin", desc: "General coding assistant", icon: "i-mdi-robot" },
-  { id: "debugger", name: "Debugger", desc: "Find and fix bugs", icon: "i-mdi-console" },
-  { id: "reviewer", name: "Reviewer", desc: "Review code and UX", icon: "i-mdi-message-text" },
-  { id: "creative", name: "Creative", desc: "Brainstorm ideas", icon: "i-mdi-sparkles" },
-];
+type View = "list" | "new" | "chat";
 
 export function DevinTab() {
-  const [opsLoading, setOpsLoading] = createSignal<string | null>(null);
+  const [view, setView] = createSignal<View>("list");
+  const [activeSession, setActiveSession] = createSignal<DevinSession | null>(null);
 
-  function run(agent: string) {
+  const cfg = () => appStore.devinSettings;
+  const configured = () =>
+    cfg().useProxy || (cfg().orgId.trim() !== "" && cfg().apiKey.trim() !== "");
+
+  function openChat(session: DevinSession) {
     haptic("light");
-    showStatus(`${agent} agent ready (mock)`, "info");
+    setActiveSession(session);
+    setView("chat");
   }
 
-  async function refreshStatus() {
+  function newSession() {
     haptic("light");
-    setOpsLoading("status");
-    try {
-      const [repo, worker] = await Promise.all([fetchRepoStatus(), fetchWorkerStatus()]);
-      showStatus(`Repo: ${repo.name}, Worker: ${worker.status}`, worker.status === "healthy" ? "success" : "warning");
-    } catch (err) {
-      showStatus(err instanceof Error ? err.message : "Status refresh failed", "error");
-    } finally {
-      setOpsLoading(null);
-    }
+    setView("new");
   }
 
-  async function deploy() {
-    haptic("light");
-    setOpsLoading("deploy");
-    try {
-      const res = await fetch("/api/deploy", { method: "POST" });
-      const data = await res.json();
-      if (data.ok) {
-        showStatus(data.message ?? "Deploy triggered", "success");
-      } else {
-        showStatus(data.error ?? "Deploy not configured", "warning");
-      }
-    } catch (err) {
-      showStatus(err instanceof Error ? err.message : "Deploy failed", "error");
-    } finally {
-      setOpsLoading(null);
-    }
+  function onCreated(session: DevinSession) {
+    setActiveSession(session);
+    setView("chat");
   }
 
-  async function push() {
-    haptic("light");
-    setOpsLoading("push");
-    try {
-      const res = await fetch("/api/push", { method: "POST" });
-      const data = await res.json();
-      if (data.ok) {
-        showStatus(data.message ?? "Push triggered", "success");
-      } else {
-        showStatus(data.error ?? "Push not configured", "warning");
-      }
-    } catch (err) {
-      showStatus(err instanceof Error ? err.message : "Push failed", "error");
-    } finally {
-      setOpsLoading(null);
-    }
-  }
+  return (
+    <div class="h-full">
+      <Show when={!configured()} fallback={<DevinViews view={view()} onNew={newSession} onSelect={openChat} onCreated={onCreated} session={activeSession()} back={() => setView("list")} />}>
+        <DevinOnboarding />
+      </Show>
+    </div>
+  );
+}
 
-  function opButton(id: string, label: string, icon: string, onClick: () => void) {
-    const loading = opsLoading() === id;
-    return (
-      <button
-        onClick={onClick}
-        disabled={loading}
-        class="flex items-center gap-2 rounded-xl bg-surface-2 px-3 py-2 text-sm font-medium text-text transition hover:bg-surface-3 disabled:opacity-50"
-      >
-        {loading ? (
-          <span class="i-mdi-loading h-4 w-4 animate-spin" />
-        ) : (
-          <span class={`${icon} h-4 w-4 text-primary`} />
-        )}
-        {label}
-      </button>
-    );
+function DevinOnboarding() {
+  const cfg = () => appStore.devinSettings;
+  const [org, setOrg] = createSignal(cfg().orgId);
+  const [key, setKey] = createSignal(cfg().apiKey);
+  const [proxy, setProxy] = createSignal(cfg().useProxy);
+
+  function save() {
+    haptic("success");
+    setDevinSettings({
+      orgId: org().trim(),
+      apiKey: key().trim(),
+      useProxy: proxy(),
+    });
+    showStatus("Devin settings saved", "success");
   }
 
   return (
     <div class="flex h-full flex-col gap-4 px-4">
-      <div>
-        <h2 class="mb-3 text-lg font-bold text-text">AI Agents</h2>
-        <div class="grid grid-cols-2 gap-3">
-          <For each={agents}>
-            {({ name, desc, icon }) => (
-              <button
-                onClick={() => run(name)}
-                class="flex flex-col items-start gap-2 rounded-2xl bg-surface-2 p-4 text-left transition active:scale-95"
-              >
-                <span class={`${icon} h-6 w-6 text-primary`} />
-                <span class="font-semibold text-text">{name}</span>
-                <span class="text-xs text-text-secondary">{desc}</span>
-              </button>
-            )}
-          </For>
-        </div>
+      <div class="mb-2 rounded-2xl bg-surface-2 p-4 text-center">
+        <span class="i-mdi-robot mx-auto mb-2 h-10 w-10 text-primary" />
+        <h2 class="text-lg font-bold text-text">Connect Devin</h2>
+        <p class="text-sm text-text-secondary">
+          Use your org ID and API key, or enable the Cloudflare proxy.
+        </p>
       </div>
 
-      <div>
-        <h2 class="mb-3 text-lg font-bold text-text">Ops</h2>
-        <div class="mb-4 flex flex-wrap gap-2">
-          {opButton("status", "Refresh status", "i-mdi-cloud", refreshStatus)}
-          {opButton("deploy", "Deploy", "i-mdi-rocket", deploy)}
-          {opButton("push", "Push to GitHub", "i-mdi-source-branch", push)}
-        </div>
-        <AiFixPanel />
+      <label class="flex items-center justify-between rounded-2xl bg-surface-2 p-3">
+        <span class="text-sm text-text">Use Cloudflare Worker proxy</span>
+        <Switch checked={proxy()} onChange={setProxy} />
+      </label>
+
+      <Input
+        value={org()}
+        onChange={setOrg}
+        label="Devin Org ID"
+        placeholder="org-..."
+      />
+
+      <Show when={!proxy()}>
+        <Input
+          value={key()}
+          onChange={setKey}
+          label="Devin API Key"
+          placeholder="cog-..."
+        />
+        <p class="text-xs text-text-secondary">
+          Stored locally. Recommended to use the proxy instead.
+        </p>
+      </Show>
+
+      <div class="mt-auto">
+        <Button onClick={save} class="w-full">
+          Save settings
+        </Button>
       </div>
     </div>
+  );
+}
+
+interface DevinViewsProps {
+  view: View;
+  onNew: () => void;
+  onSelect: (s: DevinSession) => void;
+  onCreated: (s: DevinSession) => void;
+  session: DevinSession | null;
+  back: () => void;
+}
+
+function DevinViews(props: DevinViewsProps) {
+  return (
+    <>
+      {props.view === "list" && (
+        <DevinSessionList onNew={props.onNew} onSelect={props.onSelect} />
+      )}
+      {props.view === "new" && (
+        <DevinNewSession onCreated={props.onCreated} onCancel={props.back} />
+      )}
+      {props.view === "chat" && props.session && (
+        <DevinChat
+          session={props.session}
+          onBack={props.back}
+          onArchive={props.back}
+        />
+      )}
+    </>
   );
 }

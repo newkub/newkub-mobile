@@ -1,6 +1,6 @@
 import { createStore, produce } from "solid-js/store";
 import { deleteAlarm, deleteReminder, pushAlarm, pushReminder } from "../lib/sync";
-import type { Alarm, PomodoroSession, Reminder, TimerPreset } from "../types";
+import type { Alarm, DevinSettings, PomodoroSession, Reminder, TimerPreset } from "../types";
 
 export * from "../types";
 
@@ -83,6 +83,7 @@ export interface AppState {
   reminders: Reminder[];
   pomodoroSessions: PomodoroSession[];
   elevenLabsKey: string;
+  devinSettings: DevinSettings;
   firstVisit: boolean;
   settingsOpen: boolean;
 }
@@ -102,6 +103,13 @@ const initialState: AppState = {
   reminders: [],
   pomodoroSessions: [],
   elevenLabsKey: "",
+  devinSettings: {
+    orgId: "",
+    apiKey: "",
+    useProxy: true,
+    notifyCompleted: true,
+    notifyWaiting: true,
+  },
   firstVisit: true,
   settingsOpen: false,
 };
@@ -308,6 +316,14 @@ export function addPomodoroSession(session: PomodoroSession) {
 
 export function setElevenLabsKey(key: string) {
   setStore("elevenLabsKey", key);
+  queuePersist();
+}
+
+export function setDevinSettings(settings: Partial<DevinSettings>) {
+  setStore(
+    "devinSettings",
+    (current) => ({ ...current, ...settings }) as DevinSettings,
+  );
   queuePersist();
 }
 

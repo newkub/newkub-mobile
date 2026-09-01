@@ -6,8 +6,9 @@ import { handleStatus } from "./api/status";
 import { handleAiFix } from "./api/ai-fix";
 import { handleDeploy } from "./api/deploy";
 import { handlePush } from "./api/push";
+import { handleDevin, type DevinEnv } from "./api/devin";
 
-export interface Env extends AlarmsEnv, RemindersEnv {
+export interface Env extends AlarmsEnv, RemindersEnv, DevinEnv {
   ASSETS: Fetcher;
   OPENAI_API_KEY?: string;
   CF_ACCOUNT_ID?: string;
@@ -46,6 +47,10 @@ export default {
 
       if (url.pathname === "/api/push") {
         return await handlePush(request, env);
+      }
+
+      if (url.pathname.startsWith("/api/devin")) {
+        return await handleDevin(request, env);
       }
 
       // Static assets

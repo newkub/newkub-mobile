@@ -4,6 +4,7 @@ import {
   setGlobalSetting,
   updateTab,
   setElevenLabsKey,
+  setDevinSettings,
   setActiveTab,
   setClockSubTab,
   type TabDefinition,
@@ -14,22 +15,39 @@ import { Switch } from "./Switch";
 import { haptic } from "../lib/capacitor";
 import { showStatus } from "../lib/status";
 
-type Section = "global" | "tabs" | "logo" | "tab";
+type Section = "global" | "tabs" | "logo" | "tab" | "devin";
 
 const sections: { id: Section; label: string; icon: string }[] = [
   { id: "global", label: "Global", icon: "i-mdi-tune" },
   { id: "tabs", label: "Tabs", icon: "i-mdi-home" },
   { id: "logo", label: "Logo", icon: "i-mdi-image" },
   { id: "tab", label: "Per-Tab", icon: "i-mdi-clock" },
+  { id: "devin", label: "Devin", icon: "i-mdi-robot" },
 ];
 
 export function SettingsModal(props: { onClose: () => void }) {
   const [section, setSection] = createSignal<Section>("global");
   const [key, setKey] = createSignal(appStore.elevenLabsKey);
+  const [devinOrg, setDevinOrg] = createSignal(appStore.devinSettings.orgId);
+  const [devinKey, setDevinKey] = createSignal(appStore.devinSettings.apiKey);
+  const [devinProxy, setDevinProxy] = createSignal(appStore.devinSettings.useProxy);
+  const [devinNotifyDone, setDevinNotifyDone] = createSignal(appStore.devinSettings.notifyCompleted);
+  const [devinNotifyWait, setDevinNotifyWait] = createSignal(appStore.devinSettings.notifyWaiting);
 
   function saveKey() {
     setElevenLabsKey(key());
     showStatus("ElevenLabs key saved", "success");
+  }
+
+  function saveDevin() {
+    setDevinSettings({
+      orgId: devinOrg().trim(),
+      apiKey: devinKey().trim(),
+      useProxy: devinProxy(),
+      notifyCompleted: devinNotifyDone(),
+      notifyWaiting: devinNotifyWait(),
+    });
+    showStatus("Devin settings saved", "success");
   }
 
   function toggleTab(tab: TabDefinition) {
@@ -223,6 +241,50 @@ export function SettingsModal(props: { onClose: () => void }) {
                 )}
               </For>
             </div>
+          </Show>
+
+          <Show when={section() === "devin"}>
+            <div class="rounded-2xl border border-border bg-surface-2 p-4">
+              <h3 class="mb-3 font-semibold text-text">Devin API</h3>
+              <label class="mb-4 flex items-center justify-between">
+                <span class="text-sm text-text">Use Cloudflare Worker proxy</span>
+                <Switch checked={devinProxy()} onChange={setDevinProxy} />
+              </label>
+              <Input
+                value={devinOrg()}
+                onChange={setDevinOrg}
+                label="Org ID"
+                placeholder="org-..."
+                class="mb-3"
+              />
+              <Show when={!devinProxy()}>
+                <Input
+                  value={devinKey()}
+                  onChange={setDevinKey}
+                  label="API Key"
+                  placeholder="cog-..."
+                />
+                <p class="mt-2 text-xs text-text-secondary">
+                  Stored locally. The proxy is recommended for security.
+                </p>
+              </Show>
+            </div>
+
+            <div class="rounded-2xl border border-border bg-surface-2 p-4">
+              <h3 class="mb-3 font-semibold text-text">Notifications</h3>
+              <label class="mb-3 flex items-center justify-between">
+                <span class="text-sm text-text">When completed</span>
+                <Switch checked={devinNotifyDone()} onChange={setDevinNotifyDone} />
+              </label>
+              <label class="flex items-center justify-between">
+                <span class="text-sm text-text">When waiting for input</span>
+                <Switch checked={devinNotifyWait()} onChange={setDevinNotifyWait} />
+              </label>
+            </div>
+
+            <Button onClick={saveDevin} class="w-full">
+              Save Devin settings
+            </Button>
           </Show>
         </div>
       </div>
