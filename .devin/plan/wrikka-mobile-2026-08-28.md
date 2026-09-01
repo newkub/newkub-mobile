@@ -1,6 +1,6 @@
 ---
-name: newkub-mobile
-description: Deep plan for renaming mobile-clock to newkub-mobile, converting Cloudflare Pages to Workers, and rebuilding UX with Home + Clock + Task + Devin + Notes + Saved + Email tabs
+name: wrikka-mobile
+description: Deep plan for renaming mobile-clock to wrikka-mobile, converting Cloudflare Pages to Workers, and rebuilding UX with Home + Clock + Task + Devin + Notes + Saved + Email tabs
 ---
 
 ## Goal

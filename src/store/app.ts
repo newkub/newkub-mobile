@@ -1,5 +1,4 @@
-import { createStore, produce } from "solid-js/store";
-import { deleteAlarm, deleteReminder, pushAlarm, pushReminder } from "../lib/sync";
+import { createStore } from "solid-js/store";
 import type { Alarm, DevinSettings, PomodoroSession, Reminder, TimerPreset } from "../types";
 
 export * from "../types";
@@ -89,7 +88,7 @@ export interface AppState {
   settingsOpen: boolean;
 }
 
-const initialState: AppState = {
+export const initialState: AppState = {
   activeTab: "home",
   lastVisitedTab: "home",
   clockSubTab: "alarm",
@@ -121,7 +120,6 @@ function loadState(): Partial<AppState> {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return {};
     const parsed = JSON.parse(raw) as Partial<AppState>;
-    // ensure default tabs are not completely overwritten by malformed data
     if (!Array.isArray(parsed.tabs) || parsed.tabs.length === 0) {
       parsed.tabs = defaultTabs;
     }
@@ -150,204 +148,13 @@ function persist() {
   }
 }
 
-// Persist on every change in a non-blocking way
 let persistTimer: ReturnType<typeof setTimeout> | null = null;
 export function queuePersist() {
   if (persistTimer) clearTimeout(persistTimer);
   persistTimer = setTimeout(persist, 200);
 }
 
-export { store as appStore, setStore as setAppStore };
+export { store as appStore, setStore };
+export const setAppStore = setStore;
 
-// Actions
-export function setActiveTab(tab: string) {
-  setStore("activeTab", tab);
-  setStore("lastVisitedTab", tab);
-  queuePersist();
-}
-
-export function setClockSubTab(tab: string) {
-  setStore("clockSubTab", tab);
-  queuePersist();
-}
-
-export function addTab(tab: TabDefinition) {
-  setStore(produce((s) => { s.tabs.push(tab); }));
-  queuePersist();
-}
-
-export function removeTab(id: string) {
-  if (["home", "clock"].includes(id)) return;
-  setStore(produce((s) => { s.tabs = s.tabs.filter((t) => t.id !== id); }));
-  queuePersist();
-}
-
-export function updateTab(id: string, patch: Partial<TabDefinition>) {
-  setStore(
-    "tabs",
-    (tabs) => tabs.map((t) => (t.id === id ? { ...t, ...patch } as TabDefinition : t))
-  );
-  queuePersist();
-}
-
-export function setHomeWidgets(widgets: HomeWidget[]) {
-  setStore("homeWidgets", widgets);
-  queuePersist();
-}
-
-export function addHomeWidget(widget: HomeWidget) {
-  setStore(produce((s) => { s.homeWidgets.push(widget); }));
-  queuePersist();
-}
-
-export function removeHomeWidget(id: string) {
-  setStore(
-    "homeWidgets",
-    (widgets) => widgets.filter((w) => w.id !== id)
-  );
-  queuePersist();
-}
-
-export function setGlobalSetting<K extends keyof GlobalSettings>(key: K, value: GlobalSettings[K]) {
-  setStore("globalSettings", key, value);
-  queuePersist();
-}
-
-export function setTabSetting(tabId: string, key: string, value: unknown) {
-  setStore(produce((s) => {
-    s.tabSettings[tabId] = s.tabSettings[tabId] ?? {};
-    s.tabSettings[tabId][key] = value;
-  }));
-  queuePersist();
-}
-
-export function setStatus(status: StatusMessage) {
-  setStore("status", status);
-  if (status.type !== "error") {
-    setTimeout(() => setStore("status", null), 3000);
-  }
-}
-
-export function clearStatus() {
-  setStore("status", null);
-}
-
-export function setUserId(id: string) {
-  setStore("userId", id);
-  queuePersist();
-}
-
-export function addAlarm(alarm: Alarm) {
-  setStore(produce((s) => { s.alarms.push(alarm); }));
-  if (store.userId) pushAlarm(store.userId, alarm).catch(() => null);
-  queuePersist();
-}
-
-export function updateAlarm(id: string, patch: Partial<Alarm>) {
-  setStore(
-    "alarms",
-    (alarms) => alarms.map((a) => (a.id === id ? { ...a, ...patch } as Alarm : a))
-  );
-  const updated = store.alarms.find((a) => a.id === id);
-  if (updated && store.userId) pushAlarm(store.userId, updated).catch(() => null);
-  queuePersist();
-}
-
-export function removeAlarm(id: string) {
-  setStore("alarms", (alarms) => alarms.filter((a) => a.id !== id));
-  if (store.userId) deleteAlarm(store.userId, id).catch(() => null);
-  queuePersist();
-}
-
-export function toggleAlarm(id: string) {
-  const alarm = store.alarms.find((a) => a.id === id);
-  if (!alarm) return;
-  updateAlarm(id, { enabled: !alarm.enabled });
-}
-
-export function addTimerPreset(preset: TimerPreset) {
-  setStore(produce((s) => { s.timerPresets.push(preset); }));
-  queuePersist();
-}
-
-export function removeTimerPreset(id: string) {
-  setStore("timerPresets", (presets) => presets.filter((p) => p.id !== id));
-  queuePersist();
-}
-
-export function addReminder(r: Reminder) {
-  setStore(produce((s) => { s.reminders.push(r); }));
-  if (store.userId) pushReminder(store.userId, r).catch(() => null);
-  queuePersist();
-}
-
-export function updateReminder(id: string, patch: Partial<Reminder>) {
-  setStore(
-    "reminders",
-    (reminders) => reminders.map((r) => (r.id === id ? { ...r, ...patch } as Reminder : r))
-  );
-  const updated = store.reminders.find((r) => r.id === id);
-  if (updated && store.userId) pushReminder(store.userId, updated).catch(() => null);
-  queuePersist();
-}
-
-export function removeReminder(id: string) {
-  setStore("reminders", (reminders) => reminders.filter((r) => r.id !== id));
-  if (store.userId) deleteReminder(store.userId, id).catch(() => null);
-  queuePersist();
-}
-
-export function toggleReminder(id: string) {
-  const r = store.reminders.find((x) => x.id === id);
-  if (!r) return;
-  updateReminder(id, { enabled: !r.enabled });
-}
-
-export function addPomodoroSession(session: PomodoroSession) {
-  setStore(produce((s) => {
-    const existing = s.pomodoroSessions.find((x) => x.date === session.date);
-    if (existing) {
-      existing.completedCycles += session.completedCycles;
-      existing.totalFocusSeconds += session.totalFocusSeconds;
-    } else {
-      s.pomodoroSessions.push(session);
-    }
-  }));
-  queuePersist();
-}
-
-export function setElevenLabsKey(key: string) {
-  setStore("elevenLabsKey", key);
-  queuePersist();
-}
-
-export function setDevinSettings(settings: Partial<DevinSettings>) {
-  setStore(
-    "devinSettings",
-    (current) => ({ ...current, ...settings }) as DevinSettings,
-  );
-  queuePersist();
-}
-
-export function setActiveDevinSessionId(id: string | null) {
-  setStore("activeDevinSessionId", id);
-  queuePersist();
-}
-
-export function setFirstVisit(v: boolean) {
-  setStore("firstVisit", v);
-  queuePersist();
-}
-
-export function openSettings() {
-  setStore("settingsOpen", true);
-}
-
-export function closeSettings() {
-  setStore("settingsOpen", false);
-}
-
-export function resetStore() {
-  setStore(initialState);
-  queuePersist();
-}
+export * from "./actions";

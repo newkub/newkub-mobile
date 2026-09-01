@@ -1,12 +1,12 @@
 ---
 name: devin-api-uxui-sketch
-description: UX/UI sketch สำหรับการ integrate Devin API เข้ากับ newkub-mobile
+description: UX/UI sketch สำหรับการ integrate Devin API เข้ากับ wrikka-mobile
 created: 2026-09-01
 ---
 
 ## Goal
 
-ออกแบบหน้าจอ Devin tab ใหม่ใน newkub-mobile เพื่อใช้ Devin API v3 สร้าง/คุย/ติดตาม session แบบเต็มรูปแบบบน Android (Capacitor) และ PWA
+ออกแบบหน้าจอ Devin tab ใหม่ใน wrikka-mobile เพื่อใช้ Devin API v3 สร้าง/คุย/ติดตาม session แบบเต็มรูปแบบบน Android (Capacitor) และ PWA
 
 ## Scope
 

@@ -1,13 +1,13 @@
 ---
 name: devin-api-integration
-description: Plan for integrating Devin API into newkub-mobile
-status: in_progress
+description: Plan for integrating Devin API into wrikka-mobile
+status: completed
 created: 2026-09-01
 ---
 
 ## Goal
 
-เชื่อมต่อ Devin API v3 เข้ากับ newkub-mobile เปลี่ยน Devin tab จาก mock เป็น chat/session manager ทีใช้งานได้จริง บน Android (Capacitor) และ PWA โดยใช้ API ให้เต็มประสิทธิภาพผ่าน backend proxy, polling ทีประหยัด, และ notification
+เชื่อมต่อ Devin API v3 เข้ากับ wrikka-mobile เปลี่ยน Devin tab จาก mock เป็น chat/session manager ทีใช้งานได้จริง บน Android (Capacitor) และ PWA โดยใช้ API ให้เต็มประสิทธิภาพผ่าน backend proxy, polling ทีประหยัด, และ notification
 
 ## Scope
 

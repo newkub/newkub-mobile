@@ -1,13 +1,13 @@
 ---
 name: mobile-clock-uxui-and-devin-v2
-description: Plan for finishing Devin API v2/v3 and improving UX/UI across all mobile-clock routes
-status: in_progress
+description: Plan for finishing Devin API v2/v3 and improving UX/UI across all wrikka-mobile routes
+status: completed
 created: 2026-09-01
 ---
 
 ## Goal
 
-ทำ feature ทีเหลือทีเกี่ยวกับ Devin API ให้ครบ และปรับปรุง UX/UI ให้ทั้งทุก route/screen ใน newkub-mobile
+ทำ feature ทีเหลือทีเกี่ยวกับ Devin API ให้ครบ และปรับปรุง UX/UI ให้ทั้งทุก route/screen ใน wrikka-mobile
 
 ## Scope
 

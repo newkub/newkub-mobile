@@ -1,12 +1,12 @@
 ---
 name: mobile-clock-uxui-all-routes
-description: UX/UI routes report for newkub-mobile
+description: UX/UI routes report for wrikka-mobile
 created: 2026-09-01
 ---
 
 ## Goal
 
-รวบรวม routes/screens ทั้งหมดของ newkub-mobile พร้อม UX metadata เพื่อปรับปรุง UX/UI
+รวบรวม routes/screens ทั้งหมดของ wrikka-mobile พร้อม UX metadata เพื่อปรับปรุง UX/UI
 
 ## Navigation Pattern
 
