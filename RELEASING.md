@@ -14,7 +14,7 @@ The AAB is at `android/app/build/outputs/bundle/release/app-release.aab`.
 
 ## Signing
 
-Keystore: `android/app/newkub-mobile-upload.keystore`
+Keystore: `android/app/wrikka-mobile-upload.keystore`
 Properties: `android/app/keystore.properties` (not committed)
 Template: `android/app/keystore.properties.template`
 
@@ -25,7 +25,7 @@ For Play Store, use the upload keystore. Google Play will manage the final app s
 ### Manual
 
 1. Open https://play.google.com/console
-2. Create app with package name `com.wrikka.wrikkamobile`
+2. Create app with package name `com.wrikka.mobile`
 3. Go to `Release > Production > Create new release`
 4. Upload `app-release.aab`
 5. Add release notes, set privacy policy to `https://wrikka-mobile.workers.dev/privacy-policy.html`
@@ -41,19 +41,19 @@ For Play Store, use the upload keystore. Google Play will manage the final app s
    - Click `Create service account` and follow the steps
    - Grant the service account `Release Manager` role
    - Download the JSON key
-2. Add GitHub secrets in `wrikka/wrikka-mobile`:
+2. Add GitHub secrets in `newkub/wrikka-mobile`:
    - `PLAY_STORE_SERVICE_ACCOUNT_JSON` — paste the full JSON key
-   - `SIGNING_KEYSTORE_BASE64` — base64 of `newkub-mobile-upload.keystore`
+   - `SIGNING_KEYSTORE_BASE64` — base64 of `wrikka-mobile-upload.keystore`
    - `SIGNING_STORE_PASSWORD`
    - `SIGNING_KEY_PASSWORD`
-   - `SIGNING_KEY_ALIAS` (`newkub-mobile`)
+   - `SIGNING_KEY_ALIAS` (`wrikka-mobile`)
 3. Trigger workflow: `.github/workflows/playstore.yml`
 
 To get base64 of the keystore:
 
 ```bash
 cd android/app
-base64 -w 0 newkub-mobile-upload.keystore
+base64 -w 0 wrikka-mobile-upload.keystore
 ```
 
 ## Widget

@@ -2,18 +2,16 @@ import { createSignal, For, Show } from "solid-js";
 import {
   appStore,
   setGlobalSetting,
-  updateTab,
+  setClockSubTab,
   setElevenLabsKey,
   setDevinSettings,
-  setActiveTab,
-  setClockSubTab,
-  type TabDefinition,
 } from "../store/app";
-import { Button } from "./Button";
-import { Input } from "./Input";
-import { Switch } from "./Switch";
-import { haptic } from "../lib/capacitor";
 import { showStatus } from "../lib/status";
+import { SettingsGlobalSection } from "./settings/SettingsGlobalSection";
+import { SettingsTabsSection } from "./settings/SettingsTabsSection";
+import { SettingsLogoSection } from "./settings/SettingsLogoSection";
+import { SettingsPerTabSection } from "./settings/SettingsPerTabSection";
+import { SettingsDevinSection } from "./settings/SettingsDevinSection";
 
 type Section = "global" | "tabs" | "logo" | "tab" | "devin";
 
@@ -48,15 +46,6 @@ export function SettingsModal(props: { onClose: () => void }) {
       notifyWaiting: devinNotifyWait(),
     });
     showStatus("Devin settings saved", "success");
-  }
-
-  function toggleTab(tab: TabDefinition) {
-    if (["home", "clock"].includes(tab.id)) {
-      showStatus("Home and Clock tabs cannot be hidden", "warning");
-      return;
-    }
-    updateTab(tab.id, { visible: !tab.visible });
-    haptic(tab.visible ? "light" : "success");
   }
 
   function setStartup(tabId: string) {
@@ -106,193 +95,37 @@ export function SettingsModal(props: { onClose: () => void }) {
 
         <div class="h-[55vh] space-y-5 overflow-y-auto pr-2 sm:h-auto">
           <Show when={section() === "global"}>
-            <div class="rounded-2xl border border-border bg-surface-2 p-4">
-              <h3 class="mb-3 flex items-center gap-2 font-semibold text-text">
-                <span class="i-mdi-home h-4 w-4 text-primary" /> Startup tab
-              </h3>
-              <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                <For
-                each={["home", "last", ...appStore.tabs.filter((t) => t.visible).map((t) => t.id)]}
-              >
-                  {(id) => (
-                    <button
-                      onClick={() => setStartup(id as string)}
-                      class={`rounded-xl px-3 py-2 text-sm font-medium transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 ${
-                        appStore.globalSettings.startup === id
-                          ? "bg-primary text-white"
-                          : "bg-surface text-text-secondary hover:text-text"
-                      }`}
-                    >
-                      {id === "last" ? "Last used" : id === "home" ? "Home" : appStore.tabs.find((t) => t.id === id)?.label}
-                    </button>
-                  )}
-                </For>
-              </div>
-            </div>
-
-            <div class="rounded-2xl border border-border bg-surface-2 p-4">
-              <h3 class="mb-3 flex items-center gap-2 font-semibold text-text">
-                <span class="i-mdi-clock h-4 w-4 text-primary" /> Clock default sub-tab
-              </h3>
-              <div class="flex flex-wrap gap-2">
-                <For each={["alarm", "stopwatch", "timer", "pomodoro", "reminder"]}>
-                  {(sub) => (
-                    <button
-                      onClick={() => setClockDefault(sub)}
-                      class={`rounded-xl px-3 py-2 text-sm font-medium capitalize transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 ${
-                        appStore.globalSettings.defaultClockSubTab === sub
-                          ? "bg-primary text-white"
-                          : "bg-surface text-text-secondary hover:text-text"
-                      }`}
-                    >
-                      {sub}
-                    </button>
-                  )}
-                </For>
-              </div>
-            </div>
-
-            <div class="rounded-2xl border border-border bg-surface-2 p-4">
-              <h3 class="mb-3 font-semibold text-text">Preferences</h3>
-              <div class="space-y-3">
-                <label class="flex items-center justify-between">
-                  <span class="text-sm text-text-secondary">Haptics</span>
-                  <Switch
-                    checked={appStore.globalSettings.haptics}
-                    onChange={(v) => setGlobalSetting("haptics", v)}
-                    aria-label="Enable haptics"
-                  />
-                </label>
-                <label class="flex items-center justify-between">
-                  <span class="text-sm text-text-secondary">Status toast</span>
-                  <Switch
-                    checked={appStore.globalSettings.statusToast}
-                    onChange={(v) => setGlobalSetting("statusToast", v)}
-                    aria-label="Enable status toast"
-                  />
-                </label>
-                <label class="flex items-center justify-between">
-                  <span class="text-sm text-text-secondary">Notifications</span>
-                  <Switch
-                    checked={appStore.globalSettings.notifications}
-                    onChange={(v) => setGlobalSetting("notifications", v)}
-                    aria-label="Enable notifications"
-                  />
-                </label>
-              </div>
-            </div>
-
-            <div class="rounded-2xl border border-border bg-surface-2 p-4">
-              <label class="mb-2 block text-sm font-medium text-text">ElevenLabs API Key</label>
-              <Input type="text" value={key()} onChange={setKey} placeholder="sk_..." />
-              <p class="mt-2 text-xs text-muted">Stored locally on device. Never shared.</p>
-              <Button onClick={saveKey} class="mt-3 w-full" aria-label="Save ElevenLabs key">
-                Save key
-              </Button>
-            </div>
+            <SettingsGlobalSection
+              elevenLabsKey={key()}
+              setElevenLabsKey={setKey}
+              saveKey={saveKey}
+              setStartup={setStartup}
+              setClockDefault={setClockDefault}
+            />
           </Show>
-
           <Show when={section() === "tabs"}>
-            <div class="rounded-2xl border border-border bg-surface-2 p-4">
-              <h3 class="mb-3 font-semibold text-text">Visible tabs</h3>
-              <div class="space-y-2">
-                <For each={appStore.tabs}>
-                  {(tab) => (
-                    <label class="flex items-center justify-between rounded-xl bg-surface p-3">
-                      <span class="text-sm font-medium text-text">{tab.label}</span>
-                      <Switch checked={tab.visible} onChange={() => toggleTab(tab)} aria-label={`Show ${tab.label} tab`} />
-                    </label>
-                  )}
-                </For>
-              </div>
-            </div>
+            <SettingsTabsSection />
           </Show>
-
           <Show when={section() === "logo"}>
-            <div class="rounded-2xl border border-border bg-surface-2 p-4 text-center">
-              <img src="/logo.svg" alt="App logo" class="mx-auto mb-4 h-24 w-24 rounded-3xl" />
-              <p class="text-sm text-text-secondary">Current logo</p>
-              <p class="mt-2 text-xs text-muted">Logo customization by URL coming soon.</p>
-              <Button
-                onClick={() => {
-                  setGlobalSetting("customLogo", "default");
-                  showStatus("Logo reset to default", "success");
-                }}
-                class="mt-3 w-full"
-                aria-label="Reset logo to default"
-              >
-                Use default logo
-              </Button>
-            </div>
+            <SettingsLogoSection />
           </Show>
-
           <Show when={section() === "tab"}>
-            <div class="rounded-2xl border border-border bg-surface-2 p-4">
-              <h3 class="mb-3 font-semibold text-text">Per-tab settings</h3>
-              <p class="text-sm text-text-secondary">
-                Select a tab to configure. Clock sub-tabs use the Clock default setting.
-              </p>
-            </div>
-            <div class="grid grid-cols-2 gap-2">
-              <For each={appStore.tabs.filter((t) => t.visible)}>
-                {(tab) => (
-                  <button
-                    onClick={() => {
-                      setActiveTab(tab.id);
-                      props.onClose();
-                      showStatus(`Open ${tab.label} settings later`, "info");
-                    }}
-                    class="rounded-xl bg-surface-2 px-3 py-2 text-left text-sm font-medium text-text transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:bg-surface-3"
-                  >
-                    {tab.label}
-                  </button>
-                )}
-              </For>
-            </div>
+            <SettingsPerTabSection onClose={props.onClose} />
           </Show>
-
           <Show when={section() === "devin"}>
-            <div class="rounded-2xl border border-border bg-surface-2 p-4">
-              <h3 class="mb-3 font-semibold text-text">Devin API</h3>
-              <label class="mb-4 flex items-center justify-between">
-                <span class="text-sm text-text">Use Cloudflare Worker proxy</span>
-                <Switch checked={devinProxy()} onChange={setDevinProxy} aria-label="Use Cloudflare Worker proxy" />
-              </label>
-              <Input
-                value={devinOrg()}
-                onChange={setDevinOrg}
-                label="Org ID"
-                placeholder="org-..."
-                class="mb-3"
-              />
-              <Show when={!devinProxy()}>
-                <Input
-                  value={devinKey()}
-                  onChange={setDevinKey}
-                  label="API Key"
-                  placeholder="cog-..."
-                />
-                <p class="mt-2 text-xs text-text-secondary">
-                  Stored locally. The proxy is recommended for security.
-                </p>
-              </Show>
-            </div>
-
-            <div class="rounded-2xl border border-border bg-surface-2 p-4">
-              <h3 class="mb-3 font-semibold text-text">Notifications</h3>
-              <label class="mb-3 flex items-center justify-between">
-                <span class="text-sm text-text">When completed</span>
-                <Switch checked={devinNotifyDone()} onChange={setDevinNotifyDone} aria-label="Notify when Devin session completes" />
-              </label>
-              <label class="flex items-center justify-between">
-                <span class="text-sm text-text">When waiting for input</span>
-                <Switch checked={devinNotifyWait()} onChange={setDevinNotifyWait} aria-label="Notify when Devin is waiting for input" />
-              </label>
-            </div>
-
-            <Button onClick={saveDevin} class="w-full" aria-label="Save Devin settings">
-              Save Devin settings
-            </Button>
+            <SettingsDevinSection
+              org={devinOrg()}
+              setOrg={setDevinOrg}
+              key={devinKey()}
+              setKey={setDevinKey}
+              useProxy={devinProxy()}
+              setUseProxy={setDevinProxy}
+              notifyDone={devinNotifyDone()}
+              setNotifyDone={setDevinNotifyDone}
+              notifyWait={devinNotifyWait()}
+              setNotifyWait={setDevinNotifyWait}
+              save={saveDevin}
+            />
           </Show>
         </div>
       </div>

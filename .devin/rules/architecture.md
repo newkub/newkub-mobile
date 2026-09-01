@@ -1,6 +1,6 @@
 ---
 name: architecture
-description: Architecture and coding conventions for newkub-mobile
+description: Architecture and coding conventions for wrikka-mobile
 ---
 
 ## Goal

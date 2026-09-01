@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "com.newkub.newkubmobile"
+    namespace = "com.wrikka.mobile"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.newkub.newkubmobile"
+        applicationId "com.wrikka.mobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -22,9 +22,9 @@ android {
             def keystoreFile = rootProject.file('app/keystore.properties')
             if (keystoreFile.exists()) {
                 keystoreFile.withInputStream { keystoreProps.load(it) }
-                storeFile file(keystoreProps['storeFile'] ?: 'newkub-mobile-upload.keystore')
+                storeFile file(keystoreProps['storeFile'] ?: 'wrikka-mobile-upload.keystore')
                 storePassword keystoreProps['storePassword']
-                keyAlias keystoreProps['keyAlias'] ?: 'newkub-mobile'
+                keyAlias keystoreProps['keyAlias'] ?: 'wrikka-mobile'
                 keyPassword keystoreProps['keyPassword']
             }
         }
