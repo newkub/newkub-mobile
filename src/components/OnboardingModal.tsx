@@ -23,7 +23,7 @@ export function OnboardingModal() {
     <Show when={appStore.firstVisit}>
       <div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
         <div class="w-full max-w-sm rounded-3xl bg-surface p-6">
-          <h2 class="mb-2 text-center text-2xl font-bold">Welcome to Newkub Mobile</h2>
+          <h2 class="mb-2 text-center text-2xl font-bold">Welcome to Wrikka Mobile</h2>
           <p class="mb-6 text-center text-text-secondary">
             Personal customizable app — Clock, Task, Devin, Notes, Saved, Email, AI tabs.
           </p>
@@ -34,7 +34,7 @@ export function OnboardingModal() {
                 <span class="i-mdi-bell h-4 w-4 text-primary" /> Notifications
               </div>
               <p class="text-xs text-text-secondary">Allow notifications to get alarm and reminder alerts.</p>
-              <Button onClick={enableNotifications} class="mt-3 w-full" size="sm">
+              <Button onClick={enableNotifications} class="mt-3 w-full" size="sm" aria-label="Enable notifications">
                 Enable
               </Button>
             </div>
@@ -55,7 +55,7 @@ export function OnboardingModal() {
             </div>
           </div>
 
-          <Button onClick={finish} class="mt-6 w-full">
+          <Button onClick={finish} class="mt-6 w-full" aria-label="Get started">
             Get Started
           </Button>
         </div>

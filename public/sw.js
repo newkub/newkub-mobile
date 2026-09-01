@@ -8,7 +8,7 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("push", (event) => {
-  const data = event.data ? event.data.json() : { title: "Newkub Mobile", body: "You have a notification" };
+  const data = event.data ? event.data.json() : { title: "Wrikka Mobile", body: "You have a notification" };
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,

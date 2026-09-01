@@ -50,7 +50,11 @@ export function DevinChatInput(props: DevinChatInputProps) {
               <div class="flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-xs text-primary">
                 <span class="i-mdi-attachment h-3 w-3" />
                 <span class="max-w-[120px] truncate">{url}</span>
-                <button onClick={() => removeUrl(url)} class="ml-1">
+                <button
+                  onClick={() => removeUrl(url)}
+                  class="ml-1 rounded-full p-0.5 transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  aria-label={`Remove attachment ${url}`}
+                >
                   <span class="i-mdi-close h-3 w-3" />
                 </button>
               </div>
@@ -67,7 +71,7 @@ export function DevinChatInput(props: DevinChatInputProps) {
             placeholder="Paste image or file URL..."
             class="flex-1"
           />
-          <Button onClick={addUrl} size="sm">
+          <Button onClick={addUrl} size="sm" aria-label="Add attachment URL">
             Add
           </Button>
         </div>
@@ -76,7 +80,7 @@ export function DevinChatInput(props: DevinChatInputProps) {
       <div class="flex items-end gap-2">
         <button
           onClick={() => { haptic("light"); setShowAttach(!showAttach()); }}
-          class="rounded-full p-2 text-text-secondary transition hover:text-text"
+          class="rounded-full p-2 text-text-secondary transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:text-text"
           aria-label="Attach file URL"
         >
           <span class="i-mdi-attachment h-5 w-5" />
@@ -87,7 +91,7 @@ export function DevinChatInput(props: DevinChatInputProps) {
           placeholder="Type a message..."
           class="flex-1"
         />
-        <Button onClick={send} disabled={props.disabled} size="md" class="shrink-0">
+        <Button onClick={send} disabled={props.disabled} size="md" class="shrink-0" aria-label="Send message">
           <span class="i-mdi-send h-5 w-5" />
         </Button>
       </div>

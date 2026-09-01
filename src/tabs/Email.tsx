@@ -14,7 +14,7 @@ interface Draft {
   body: string;
 }
 
-const DRAFTS_KEY = "newkub-mobile-drafts";
+const DRAFTS_KEY = "wrikka-mobile-drafts";
 
 export function EmailTab() {
   const [drafts, setDrafts] = createSignal<Draft[]>([]);
@@ -67,18 +67,19 @@ export function EmailTab() {
           value={body()}
           onInput={(e) => setBody(e.currentTarget.value)}
           placeholder="Message"
-          class="h-24 w-full resize-none rounded-2xl border border-border bg-surface-2 p-3 text-sm text-text outline-none placeholder:text-muted focus:border-primary"
+          class="h-24 w-full resize-none rounded-2xl border border-border bg-surface-2 p-3 text-sm text-text outline-none transition placeholder:text-muted focus:border-primary focus:ring-2 focus:ring-primary/20"
+          aria-label="Email body"
         />
-        <Button onClick={send} class="w-full">
+        <Button onClick={send} class="w-full" aria-label="Save email draft">
           <span class="i-mdi-send mr-2 h-4 w-4" />
           Save draft
         </Button>
       </div>
 
       <Show when={loading()}>
-        <div class="space-y-2">
+        <div class="space-y-2" aria-busy="true" aria-label="Loading drafts">
           <For each={[1, 2, 3]}>
-            {() => <div class="h-20 animate-pulse rounded-2xl bg-surface-2" />}
+            {() => <div class="skeleton h-20 w-full" aria-busy="true" aria-label="Loading" />}
           </For>
         </div>
       </Show>
@@ -97,7 +98,11 @@ export function EmailTab() {
             <div class="rounded-2xl bg-surface-2 p-3">
               <div class="mb-1 flex items-center justify-between">
                 <span class="text-sm font-semibold text-text">{d.subject}</span>
-                <button onClick={() => remove(d.id)} class="text-text-secondary hover:text-rose-400">
+                <button
+                  onClick={() => remove(d.id)}
+                  class="text-text-secondary transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:text-rose-400"
+                  aria-label="Delete draft"
+                >
                   <span class="i-mdi-delete h-4 w-4" />
                 </button>
               </div>

@@ -13,7 +13,7 @@ interface SavedItem {
   url: string;
 }
 
-const SAVED_KEY = "newkub-mobile-saved";
+const SAVED_KEY = "wrikka-mobile-saved";
 
 export function SavedTab() {
   const [items, setItems] = createSignal<SavedItem[]>([]);
@@ -70,16 +70,16 @@ export function SavedTab() {
         <Input value={title()} onChange={setTitle} placeholder="Title" />
         <div class="flex gap-2">
           <Input value={url()} onChange={setUrl} placeholder="https://..." class="flex-1" />
-          <Button onClick={add}>
+          <Button onClick={add} aria-label="Add saved link">
             <span class="i-mdi-plus h-5 w-5" />
           </Button>
         </div>
       </div>
 
       <Show when={loading()}>
-        <div class="space-y-2">
+        <div class="space-y-2" aria-busy="true" aria-label="Loading saved links">
           <For each={[1, 2, 3]}>
-            {() => <div class="h-14 animate-pulse rounded-2xl bg-surface-2" />}
+            {() => <div class="skeleton h-14 w-full" aria-busy="true" aria-label="Loading" />}
           </For>
         </div>
       </Show>
@@ -98,10 +98,21 @@ export function SavedTab() {
             <div class="flex items-center gap-3 rounded-2xl bg-surface-2 p-3">
               <span class="i-mdi-bookmark h-5 w-5 text-primary" />
               <span class="flex-1 truncate text-sm text-text">{i.title}</span>
-              <a href={i.url} target="_blank" rel="noreferrer" onClick={() => haptic("light")} class="text-text-secondary hover:text-primary">
+              <a
+                href={i.url}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => haptic("light")}
+                class="text-text-secondary transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:text-primary"
+                aria-label="Open link"
+              >
                 <span class="i-mdi-open-in-new h-4 w-4" />
               </a>
-              <button onClick={() => remove(i.id)} class="text-text-secondary hover:text-rose-400">
+              <button
+                onClick={() => remove(i.id)}
+                class="text-text-secondary transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:text-rose-400"
+                aria-label="Remove saved link"
+              >
                 <span class="i-mdi-delete h-4 w-4" />
               </button>
             </div>

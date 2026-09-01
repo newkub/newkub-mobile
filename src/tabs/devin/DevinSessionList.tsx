@@ -3,6 +3,7 @@ import { listDevinSessions } from "../../lib/devin";
 import type { DevinSession } from "../../types";
 import { Input } from "../../components/Input";
 import { Button } from "../../components/Button";
+import { EmptyState } from "../../components/EmptyState";
 import { haptic } from "../../lib/capacitor";
 import { showStatus } from "../../lib/status";
 
@@ -45,7 +46,7 @@ export function DevinSessionList(props: {
         <h2 class="text-lg font-bold text-text">Devin Sessions</h2>
         <button
           onClick={() => { haptic("light"); props.onNew(); }}
-          class="rounded-full bg-primary p-2 text-white transition active:scale-95"
+          class="rounded-full bg-primary p-2 text-white transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50"
           aria-label="New session"
         >
           <span class="i-mdi-plus h-5 w-5" />
@@ -59,20 +60,23 @@ export function DevinSessionList(props: {
       />
 
       <Show when={!loading() && filtered().length === 0}>
-        <div class="flex flex-1 flex-col items-center justify-center gap-3 text-text-secondary">
-          <span class="i-mdi-robot h-12 w-12 opacity-50" />
-          <p class="text-sm">No sessions yet. Start one.</p>
-          <Button onClick={() => { haptic("success"); props.onNew(); }} size="sm">
-            New session
-          </Button>
-        </div>
+        <EmptyState
+          icon="i-mdi-robot"
+          title="No sessions yet"
+          subtitle="Start a new Devin session"
+          action={
+            <Button onClick={() => { haptic("success"); props.onNew(); }} size="sm" aria-label="New session">
+              New session
+            </Button>
+          }
+        />
       </Show>
 
       <Show when={loading()}>
-        <div class="space-y-3">
+        <div class="space-y-3" aria-busy="true" aria-label="Loading sessions">
           <For each={[1, 2, 3]}>
             {() => (
-              <div class="h-20 animate-pulse rounded-2xl bg-surface-2" />
+              <div class="skeleton h-20 w-full" aria-busy="true" aria-label="Loading" />
             )}
           </For>
         </div>
@@ -83,7 +87,8 @@ export function DevinSessionList(props: {
           {(session) => (
             <button
               onClick={() => { haptic("light"); props.onSelect(session); }}
-              class="w-full rounded-2xl bg-surface-2 p-4 text-left transition active:scale-95"
+              class="w-full rounded-2xl bg-surface-2 p-4 text-left transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50"
+              aria-label={`Open session ${session.title || session.session_id}`}
             >
               <div class="flex items-start justify-between gap-2">
                 <span class="truncate font-semibold text-text">

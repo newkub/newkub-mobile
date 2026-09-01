@@ -4,7 +4,7 @@ import { showStatus } from "../lib/status";
 import { get, set } from "../lib/storage";
 import { Button } from "../components/Button";
 
-const NOTE_KEY = "newkub-mobile-note";
+const NOTE_KEY = "wrikka-mobile-note";
 
 export function NotesTab() {
   const [note, setNote] = createSignal("");
@@ -44,7 +44,7 @@ export function NotesTab() {
   return (
     <div class="flex h-full flex-col px-4">
       <Show when={loading()}>
-        <div class="h-full animate-pulse rounded-2xl bg-surface-2" />
+        <div class="skeleton h-full w-full" aria-busy="true" aria-label="Loading note" />
       </Show>
 
       <Show when={!loading()}>
@@ -52,7 +52,8 @@ export function NotesTab() {
           value={note()}
           onInput={(e) => setNote(e.currentTarget.value)}
           placeholder="Write a quick note..."
-          class="flex-1 w-full resize-none rounded-2xl border border-border bg-surface-2 p-4 text-sm text-text outline-none placeholder:text-muted focus:border-primary"
+          class="flex-1 w-full resize-none rounded-2xl border border-border bg-surface-2 p-4 text-sm text-text outline-none transition placeholder:text-muted focus:border-primary focus:ring-2 focus:ring-primary/20"
+          aria-label="Quick note"
         />
 
         <div class="mt-3 flex items-center justify-between">
@@ -62,7 +63,7 @@ export function NotesTab() {
           <Show when={!savedAt()}>
             <span class="text-xs text-text-secondary">Auto-saves while typing</span>
           </Show>
-          <Button onClick={save}>
+          <Button onClick={save} aria-label="Save note">
             <span class="i-mdi-content-save mr-2 h-4 w-4" />
             Save note
           </Button>

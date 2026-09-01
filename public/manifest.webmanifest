@@ -1,6 +1,6 @@
 {
-  "name": "Newkub Mobile",
-  "short_name": "Newkub",
+  "name": "Wrikka Mobile",
+  "short_name": "Wrikka",
   "description": "Personal customizable app — Clock, Tasks, Devin, Notes, Saved, Email, AI tabs",
   "start_url": "/",
   "display": "standalone",

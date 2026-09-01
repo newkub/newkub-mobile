@@ -73,7 +73,7 @@ function DevinOnboarding() {
 
       <label class="flex items-center justify-between rounded-2xl bg-surface-2 p-3">
         <span class="text-sm text-text">Use Cloudflare Worker proxy</span>
-        <Switch checked={proxy()} onChange={setProxy} />
+        <Switch checked={proxy()} onChange={setProxy} aria-label="Use Cloudflare Worker proxy" />
       </label>
 
       <Input
@@ -96,7 +96,7 @@ function DevinOnboarding() {
       </Show>
 
       <div class="mt-auto">
-        <Button onClick={save} class="w-full">
+        <Button onClick={save} class="w-full" aria-label="Save Devin settings">
           Save settings
         </Button>
       </div>

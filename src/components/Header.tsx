@@ -44,11 +44,11 @@ export function Header() {
         </div>
         <div class="flex items-center gap-2">
           <a
-            href={repo()?.url ?? "https://github.com/newkub/newkub-mobile"}
+            href={repo()?.url ?? "https://github.com/wrikka/wrikka-mobile"}
             target="_blank"
             rel="noreferrer"
             onClick={() => haptic("light")}
-            class="glass flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium text-text-secondary transition hover:text-text"
+            class="glass flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium text-text-secondary transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:text-text"
           >
             <span class="i-mdi-source-branch h-3.5 w-3.5" />
             {repo()?.name ?? "repo"}
@@ -59,7 +59,7 @@ export function Header() {
             target="_blank"
             rel="noreferrer"
             onClick={() => haptic("light")}
-            class="glass flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium text-text-secondary transition hover:text-text"
+            class="glass flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium text-text-secondary transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:text-text"
           >
             <span
               class={`i-mdi-cloud h-3.5 w-3.5 ${
@@ -70,7 +70,8 @@ export function Header() {
           </a>
           <button
             onClick={newTab}
-            class="glass rounded-full p-2 text-text-secondary transition hover:text-primary"
+            class="glass rounded-full p-2 text-text-secondary transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:text-primary"
+            aria-label="Create new tab"
           >
             <span class="i-mdi-plus h-5 w-5" />
           </button>

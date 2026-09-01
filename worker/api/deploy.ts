@@ -12,12 +12,12 @@ export async function handleDeploy(request: Request, env: DeployEnv): Promise<Re
   }
 
   try {
-    const res = await fetch("https://api.github.com/repos/newkub/newkub-mobile/actions/workflows/deploy.yml/dispatches", {
+    const res = await fetch("https://api.github.com/repos/wrikka/wrikka-mobile/actions/workflows/deploy.yml/dispatches", {
       method: "POST",
       headers: {
         Accept: "application/vnd.github+json",
         Authorization: `Bearer ${env.GH_TOKEN}`,
-        "User-Agent": "newkub-mobile",
+        "User-Agent": "wrikka-mobile",
       },
       body: JSON.stringify({ ref: "main" }),
     });

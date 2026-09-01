@@ -1,11 +1,11 @@
 ---
-name: newkub-mobile
+name: wrikka-mobile
 description: Personal customizable Android/PWA app with Clock, Tasks, Devin, Notes, Saved, Email tabs and Cloudflare Workers + D1 sync
 ---
 
 ## Goal
 
-Ship `newkub-mobile` ให้ทำงานบน Android (Capacitor 8) และ PWA บน Cloudflare Workers โดยมี Home เป็นหน้าแรก พร้อม tabs ปรับแต่งได้ ตั้งค่าได้ และ UX ที่ใช้งานง่าย
+Ship `wrikka-mobile` ให้ทำงานบน Android (Capacitor 8) และ PWA บน Cloudflare Workers โดยมี Home เป็นหน้าแรก พร้อม tabs ปรับแต่งได้ ตั้งค่าได้ และ UX ที่ใช้งานง่าย
 
 ## Scope
 
@@ -51,7 +51,7 @@ bun cap:open
 bun run deploy
 
 # create D1 database
-bunx wrangler d1 create newkub-mobile-db
+bunx wrangler d1 create wrikka-mobile-db
 
 # build release AAB
 cd android

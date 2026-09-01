@@ -3,6 +3,7 @@ import { CircleProgress } from "../../components/CircleProgress";
 import { Button } from "../../components/Button";
 import { useInterval } from "../../hooks/use-interval";
 import { haptic } from "../../lib/capacitor";
+import { showStatus } from "../../lib/status";
 
 interface Lap {
   id: number;
@@ -67,7 +68,7 @@ export function StopwatchTab() {
       await navigator.share({ title: "Stopwatch laps", text });
     } else {
       await navigator.clipboard.writeText(text);
-      alert("Laps copied to clipboard");
+      showStatus("Laps copied to clipboard", "success");
     }
     haptic("success");
   }
@@ -90,6 +91,7 @@ export function StopwatchTab() {
           onClick={running() ? stop : start}
           class="h-16 flex-1 rounded-3xl text-xl"
           variant={running() ? "danger" : "primary"}
+          aria-label={running() ? "Stop stopwatch" : "Start stopwatch"}
         >
           {running() ? (
             <><span class="i-mdi-pause mr-2 h-5 w-5" /> Stop</>
@@ -98,18 +100,18 @@ export function StopwatchTab() {
           )}
         </Button>
         {running() ? (
-          <Button onClick={lap} class="h-16 flex-1 rounded-3xl text-xl" variant="secondary">
+          <Button onClick={lap} class="h-16 flex-1 rounded-3xl text-xl" variant="secondary" aria-label="Record lap">
             <span class="i-mdi-flag mr-2 h-5 w-5" /> Lap
           </Button>
         ) : (
-          <Button onClick={reset} class="h-16 flex-1 rounded-3xl text-xl" variant="secondary">
+          <Button onClick={reset} class="h-16 flex-1 rounded-3xl text-xl" variant="secondary" aria-label="Reset stopwatch">
             <span class="i-mdi-refresh mr-2 h-5 w-5" /> Reset
           </Button>
         )}
       </div>
 
       {laps().length > 0 && (
-        <Button onClick={shareLaps} variant="ghost" size="sm" class="-mt-2">
+        <Button onClick={shareLaps} variant="ghost" size="sm" class="-mt-2" aria-label="Export or share laps">
           <span class="i-mdi-share mr-2 h-4 w-4" /> Export laps
         </Button>
       )}

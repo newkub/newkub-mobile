@@ -1,4 +1,6 @@
 import { ErrorBoundary as SolidErrorBoundary, type JSX } from "solid-js";
+import { Button } from "./Button";
+import { haptic } from "../lib/capacitor";
 
 interface Props {
   children: JSX.Element;
@@ -10,10 +12,11 @@ function reload() {
 
 function resetAndReload() {
   try {
-    localStorage.removeItem("newkub-mobile-store");
+    localStorage.removeItem("wrikka-mobile-store");
   } catch {
     // ignore
   }
+  haptic("warning");
   window.location.reload();
 }
 
@@ -25,18 +28,12 @@ export function ErrorBoundary(props: Props) {
           <h1 class="mb-2 text-2xl font-bold text-text">Something went wrong</h1>
           <p class="mb-6 text-sm text-muted">An unexpected error occurred.</p>
           <div class="flex gap-3">
-            <button
-              onClick={reload}
-              class="rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-white"
-            >
+            <Button onClick={reload} aria-label="Reload app">
               Reload
-            </button>
-            <button
-              onClick={resetAndReload}
-              class="rounded-2xl border border-border bg-surface px-5 py-2.5 text-sm font-medium text-text"
-            >
+            </Button>
+            <Button onClick={resetAndReload} variant="secondary" aria-label="Reset data and reload">
               Reset data & reload
-            </button>
+            </Button>
           </div>
         </div>
       )}

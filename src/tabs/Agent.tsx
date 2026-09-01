@@ -99,7 +99,7 @@ export function AgentTab() {
         class="mb-3"
       />
 
-      <Button onClick={create} disabled={loading()} class="mb-6 w-full">
+      <Button onClick={create} disabled={loading()} class="mb-6 w-full" aria-label="Create tab">
         {loading() ? (
           <span class="flex items-center gap-2">
             <span class="i-mdi-loading h-4 w-4 animate-spin" />
@@ -125,7 +125,7 @@ export function AgentTab() {
           {["tasks", "notes", "saved links", "devin dashboard", "email drafts"].map((idea) => (
             <button
               onClick={() => { haptic("light"); setPrompt(idea); }}
-              class="flex items-center gap-1 rounded-full bg-surface-2 px-3 py-1.5 text-xs font-medium text-text-secondary transition hover:text-text"
+              class="flex items-center gap-1 rounded-full bg-surface-2 px-3 py-1.5 text-xs font-medium text-text-secondary transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:text-text"
             >
               <span class="i-mdi-plus h-3 w-3" />
               {idea}

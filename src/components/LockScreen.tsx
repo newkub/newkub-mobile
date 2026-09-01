@@ -19,6 +19,8 @@ export function LockScreen(props: { onUnlock: () => void }) {
   return (
     <div
       onClick={unlock}
+      role="button"
+      aria-label="Unlock"
       class="fixed inset-0 z-[70] flex flex-col items-center justify-center bg-bg p-6 transition-opacity duration-500"
     >
       <div class="flex-1" />

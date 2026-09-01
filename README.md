@@ -1,6 +1,6 @@
-# Newkub Mobile
+# Wrikka Mobile
 
-Personal customizable app for Android and PWA. Built with React 19, Vite 8, Tailwind CSS v4, Capacitor 8 and Cloudflare Workers + D1.
+Mobile app in the Wrikka Platform — Clock, Tasks, Devin, Notes, Saved, Email, and AI tabs. Built with SolidJS, Vite 8, UnoCSS, Capacitor 8 and Cloudflare Workers + D1.
 
 ## Features
 
@@ -64,8 +64,8 @@ bun run deploy
 ## D1 Setup
 
 ```bash
-bunx wrangler d1 create newkub-mobile-db
-bunx wrangler d1 execute newkub-mobile-db --remote --file=schema.sql
+bunx wrangler d1 create wrikka-mobile-db
+bunx wrangler d1 execute wrikka-mobile-db --remote --file=schema.sql
 ```
 
 Copy the printed `database_id` into `wrangler.toml` if it differs.
@@ -106,7 +106,7 @@ Copy the printed `database_id` into `wrangler.toml` if it differs.
 
 ## Android Widget
 
-A home screen clock widget is included in the Android app. Long-press on the home screen, select `Newkub Mobile`, and place the widget.
+A home screen clock widget is included in the Android app. Long-press on the home screen, select `Wrikka Mobile`, and place the widget.
 
 ## Play Store
 

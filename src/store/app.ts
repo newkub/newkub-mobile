@@ -38,7 +38,7 @@ export interface StatusMessage {
   type: "info" | "success" | "warning" | "error";
 }
 
-const STORAGE_KEY = "newkub-mobile-store";
+const STORAGE_KEY = "wrikka-mobile-store";
 
 const defaultTabs: TabDefinition[] = [
   { id: "home", label: "Home", icon: "i-mdi-home", visible: true, type: "home" },

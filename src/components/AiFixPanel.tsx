@@ -1,67 +1,99 @@
 import { createSignal, Show } from "solid-js";
-import { Input } from "./Input";
+import { requestAiFix } from "../lib/devin";
 import { Button } from "./Button";
+import { Input } from "./Input";
 import { haptic } from "../lib/capacitor";
 import { showStatus } from "../lib/status";
 
 export function AiFixPanel() {
-  const [error, setError] = createSignal("");
+  const [open, setOpen] = createSignal(false);
+  const [query, setQuery] = createSignal("");
   const [code, setCode] = createSignal("");
+  const [result, setResult] = createSignal("");
   const [loading, setLoading] = createSignal(false);
-  const [result, setResult] = createSignal<string | null>(null);
 
-  async function fix() {
-    if (!error().trim()) return;
+  async function ask() {
+    if (!query().trim()) return;
     haptic("light");
     setLoading(true);
     try {
-      const res = await fetch("/api/ai-fix", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ error: error(), code: code() }),
+      const response = await requestAiFix({
+        query: query(),
+        codeSnippet: code(),
       });
-      const data = await res.json();
-      if (data.ok) {
-        setResult(data.suggestion);
-        showStatus("AI Fix suggestion ready", "success");
-      } else {
-        showStatus(data.error ?? "AI Fix failed", "error");
-      }
+      setResult(response);
+      haptic("success");
     } catch (err) {
-      showStatus(err instanceof Error ? err.message : "AI Fix failed", "error");
+      showStatus(err instanceof Error ? err.message : "AI fix failed", "error");
+      haptic("error");
     } finally {
       setLoading(false);
     }
   }
 
-  return (
-    <div class="rounded-2xl border border-border bg-surface-2 p-4">
-      <h3 class="mb-3 flex items-center gap-2 font-semibold text-text">
-        <span class="i-mdi-wand h-4 w-4 text-primary" /> AI Fix
-      </h3>
-      <p class="mb-3 text-sm text-text-secondary">Paste an error or describe a problem to get a fix suggestion.</p>
-      <Input value={error()} onChange={setError} placeholder="Error message or stack trace" class="mb-2" />
-      <textarea
-        value={code()}
-        onInput={(e) => setCode(e.currentTarget.value)}
-        placeholder="Optional code snippet"
-        class="mb-3 h-24 w-full resize-none rounded-2xl border border-border bg-surface p-3 text-sm text-text outline-none placeholder:text-muted focus:border-primary"
-      />
-      <Button onClick={fix} disabled={loading()} class="w-full">
-        {loading() ? (
-          <span class="i-mdi-loading mr-2 h-4 w-4 animate-spin" />
-        ) : (
-          <span class="i-mdi-wand mr-2 h-4 w-4" />
-        )}
-        {loading() ? "Analyzing..." : "Get AI Fix"}
-      </Button>
+  function clear() {
+    haptic("light");
+    setQuery("");
+    setCode("");
+    setResult("");
+  }
 
-      <Show when={result()}>
-        <div class="mt-3 rounded-xl bg-surface p-3 text-sm text-text">
-          <pre class="whitespace-pre-wrap font-mono text-xs leading-relaxed">{result()}</pre>
-          <button onClick={() => setResult(null)} class="mt-2 text-xs text-text-secondary hover:text-text">
-            <span class="i-mdi-close-circle mr-1 inline h-3 w-3" /> Clear
-          </button>
+  return (
+    <div class="rounded-3xl border border-border bg-surface-2 p-4">
+      <button
+        onClick={() => { haptic("light"); setOpen(!open()); }}
+        class="flex w-full items-center justify-between text-sm font-semibold text-text transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50"
+        aria-label={open() ? "Collapse AI fix panel" : "Expand AI fix panel"}
+      >
+        <span class="flex items-center gap-2">
+          <span class="i-mdi-robot h-4 w-4 text-primary" aria-hidden="true" />
+          AI Fix
+        </span>
+        <span class={`i-mdi-chevron-down h-4 w-4 transition ${open() ? "rotate-180" : ""}`} aria-hidden="true" />
+      </button>
+
+      <Show when={open()}>
+        <div class="mt-4 space-y-3">
+          <Input
+            value={query()}
+            onChange={setQuery}
+            placeholder="Describe the issue..."
+            aria-label="AI fix description"
+          />
+          <textarea
+            value={code()}
+            onInput={(e) => setCode(e.currentTarget.value)}
+            placeholder="Optional code snippet"
+            rows={3}
+            class="w-full resize-none rounded-2xl border border-border bg-surface-3 px-4 py-3 text-sm text-text outline-none transition placeholder:text-muted focus:border-primary focus:ring-2 focus:ring-primary/20"
+            aria-label="Optional code snippet"
+          />
+          <div class="flex gap-2">
+            <Button onClick={ask} disabled={loading()} class="flex-1" aria-label="Get AI fix">
+              {loading() ? (
+                <span class="flex items-center gap-2">
+                  <span class="i-mdi-loading h-4 w-4 animate-spin" />
+                  Thinking...
+                </span>
+              ) : (
+                <span class="flex items-center gap-2">
+                  <span class="i-mdi-wand h-4 w-4" />
+                  Get AI fix
+                </span>
+              )}
+            </Button>
+            <Show when={result()}>
+              <Button onClick={clear} variant="secondary" class="shrink-0" aria-label="Clear result">
+                <span class="i-mdi-eraser h-4 w-4" />
+              </Button>
+            </Show>
+          </div>
+
+          <Show when={result()}>
+            <div class="max-h-48 overflow-y-auto rounded-2xl bg-surface-3 p-3 text-sm text-text">
+              <p class="whitespace-pre-wrap">{result()}</p>
+            </div>
+          </Show>
         </div>
       </Show>
     </div>

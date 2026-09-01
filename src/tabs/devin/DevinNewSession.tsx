@@ -41,7 +41,7 @@ export function DevinNewSession(props: {
         <h2 class="text-lg font-bold text-text">New Devin Session</h2>
         <button
           onClick={props.onCancel}
-          class="rounded-full p-2 text-text-secondary transition hover:text-text"
+          class="rounded-full p-2 text-text-secondary transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:text-text"
           aria-label="Cancel"
         >
           <span class="i-mdi-close h-5 w-5" />
@@ -61,11 +61,12 @@ export function DevinNewSession(props: {
           {MODES.map((m) => (
             <button
               onClick={() => { haptic("light"); setMode(m); }}
-              class={`rounded-xl px-4 py-2 text-sm font-medium transition ${
+              class={`rounded-xl px-4 py-2 text-sm font-medium transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 ${
                 mode() === m
                   ? "bg-primary text-white"
                   : "bg-surface-2 text-text-secondary hover:text-text"
               }`}
+              aria-label={`Mode ${m}`}
             >
               {m}
             </button>
@@ -74,7 +75,7 @@ export function DevinNewSession(props: {
       </div>
 
       <div class="mt-auto">
-        <Button onClick={start} disabled={loading()} class="w-full">
+        <Button onClick={start} disabled={loading()} class="w-full" aria-label="Start session">
           {loading() ? (
             <span class="flex items-center gap-2">
               <span class="i-mdi-loading h-4 w-4 animate-spin" />

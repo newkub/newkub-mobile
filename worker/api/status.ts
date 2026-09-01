@@ -5,7 +5,7 @@ export interface StatusEnv {
 
 export async function handleStatus(request: Request, env: StatusEnv): Promise<Response> {
   const url = new URL(request.url);
-  const repo = url.searchParams.get("repo") ?? "newkub/newkub-mobile";
+  const repo = url.searchParams.get("repo") ?? "wrikka/wrikka-mobile";
   const [owner, name] = repo.split("/");
 
   let repoData: Record<string, unknown> | null = null;
@@ -13,7 +13,7 @@ export async function handleStatus(request: Request, env: StatusEnv): Promise<Re
 
   try {
     const res = await fetch(`https://api.github.com/repos/${owner}/${name}`, {
-      headers: { "Accept": "application/vnd.github+json", "User-Agent": "newkub-mobile" },
+      headers: { "Accept": "application/vnd.github+json", "User-Agent": "wrikka-mobile" },
     });
     if (res.ok) {
       repoData = await res.json();
@@ -30,11 +30,11 @@ export async function handleStatus(request: Request, env: StatusEnv): Promise<Re
   if (env.CF_ACCOUNT_ID && env.CF_API_TOKEN) {
     try {
       const res = await fetch(
-        `https://api.cloudflare.com/client/v4/accounts/${env.CF_ACCOUNT_ID}/workers/services/newkub-mobile`,
+        `https://api.cloudflare.com/client/v4/accounts/${env.CF_ACCOUNT_ID}/workers/services/wrikka-mobile`,
         { headers: { Authorization: `Bearer ${env.CF_API_TOKEN}` } }
       );
       cloudflareStatus = res.ok ? "healthy" : `error ${res.status}`;
-      if (res.ok) cloudflareUrl = `https://dash.cloudflare.com/?to=/:account/workers-and-pages/newkub-mobile`;
+      if (res.ok) cloudflareUrl = `https://dash.cloudflare.com/?to=/:account/workers-and-pages/wrikka-mobile`;
     } catch (err) {
       cloudflareStatus = err instanceof Error ? err.message : "Cloudflare fetch failed";
     }
@@ -52,8 +52,8 @@ export async function handleStatus(request: Request, env: StatusEnv): Promise<Re
       error: repoError,
     },
     worker: {
-      name: "newkub-mobile",
-      url: `https://newkub-mobile.workers.dev`, // placeholder; actual domain from deploy
+      name: "wrikka-mobile",
+      url: `https://wrikka-mobile.workers.dev`, // placeholder; actual domain from deploy
       dashboard: cloudflareUrl,
       status: cloudflareStatus,
     },

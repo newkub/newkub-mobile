@@ -5,7 +5,7 @@ const API_BASE = "/api";
 
 export function getUserId(): string {
   try {
-    const fromStorage = localStorage.getItem("newkub-mobile-user-id");
+    const fromStorage = localStorage.getItem("wrikka-mobile-user-id");
     if (fromStorage) return fromStorage;
   } catch {
     // storage may be blocked in some contexts
@@ -14,7 +14,7 @@ export function getUserId(): string {
   const id = generateUUID();
 
   try {
-    localStorage.setItem("newkub-mobile-user-id", id);
+    localStorage.setItem("wrikka-mobile-user-id", id);
   } catch {
     // ignore storage failures; the id will be regenerated on the next load
   }

@@ -104,7 +104,7 @@ export function PomodoroTab() {
           {(p) => (
             <button
               onClick={() => manualPhase(p)}
-              class={`flex items-center rounded-full px-4 py-2 text-sm font-semibold capitalize transition ${
+              class={`flex items-center rounded-full px-4 py-2 text-sm font-semibold capitalize transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 ${
                 phase() === p
                   ? p === "focus"
                     ? "bg-primary text-white"
@@ -113,6 +113,7 @@ export function PomodoroTab() {
                       : "bg-accent text-white"
                   : "text-text-secondary"
               }`}
+              aria-label={`Switch to ${p} phase`}
             >
               <span class={`${phaseIcon[p]} mr-1 h-4 w-4`} />
               {p}
@@ -137,6 +138,7 @@ export function PomodoroTab() {
           onClick={running() ? pause : start}
           class="h-16 flex-1 rounded-3xl text-xl"
           variant={running() ? "secondary" : "primary"}
+          aria-label={running() ? "Pause timer" : "Start timer"}
         >
           {running() ? (
             <><span class="i-mdi-pause mr-2 h-5 w-5" /> Pause</>
@@ -144,7 +146,7 @@ export function PomodoroTab() {
             <><span class="i-mdi-play mr-2 h-5 w-5" /> Start</>
           )}
         </Button>
-        <Button onClick={reset} class="h-16 flex-1 rounded-3xl text-xl" variant="secondary">
+        <Button onClick={reset} class="h-16 flex-1 rounded-3xl text-xl" variant="secondary" aria-label="Reset timer">
           <span class="i-mdi-refresh mr-2 h-5 w-5" /> Reset
         </Button>
       </div>

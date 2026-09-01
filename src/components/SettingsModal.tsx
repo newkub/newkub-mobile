@@ -76,7 +76,11 @@ export function SettingsModal(props: { onClose: () => void }) {
           <h2 class="flex items-center gap-2 text-xl font-bold text-text">
             <span class="i-mdi-cog h-6 w-6 text-primary" /> Settings
           </h2>
-          <button onClick={props.onClose} class="rounded-full p-2 text-text-secondary hover:text-text">
+          <button
+            onClick={props.onClose}
+            class="rounded-full p-2 text-text-secondary transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:text-text"
+            aria-label="Close settings"
+          >
             <span class="i-mdi-close h-5 w-5" />
           </button>
         </div>
@@ -88,7 +92,7 @@ export function SettingsModal(props: { onClose: () => void }) {
               return (
                 <button
                   onClick={() => setSection(s.id)}
-                  class={`flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition ${
+                  class={`flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 ${
                     active ? "bg-primary text-white" : "bg-surface-2 text-text-secondary hover:text-text"
                   }`}
                 >
@@ -113,7 +117,7 @@ export function SettingsModal(props: { onClose: () => void }) {
                   {(id) => (
                     <button
                       onClick={() => setStartup(id as string)}
-                      class={`rounded-xl px-3 py-2 text-sm font-medium transition ${
+                      class={`rounded-xl px-3 py-2 text-sm font-medium transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 ${
                         appStore.globalSettings.startup === id
                           ? "bg-primary text-white"
                           : "bg-surface text-text-secondary hover:text-text"
@@ -135,7 +139,7 @@ export function SettingsModal(props: { onClose: () => void }) {
                   {(sub) => (
                     <button
                       onClick={() => setClockDefault(sub)}
-                      class={`rounded-xl px-3 py-2 text-sm font-medium capitalize transition ${
+                      class={`rounded-xl px-3 py-2 text-sm font-medium capitalize transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 ${
                         appStore.globalSettings.defaultClockSubTab === sub
                           ? "bg-primary text-white"
                           : "bg-surface text-text-secondary hover:text-text"
@@ -156,6 +160,7 @@ export function SettingsModal(props: { onClose: () => void }) {
                   <Switch
                     checked={appStore.globalSettings.haptics}
                     onChange={(v) => setGlobalSetting("haptics", v)}
+                    aria-label="Enable haptics"
                   />
                 </label>
                 <label class="flex items-center justify-between">
@@ -163,6 +168,7 @@ export function SettingsModal(props: { onClose: () => void }) {
                   <Switch
                     checked={appStore.globalSettings.statusToast}
                     onChange={(v) => setGlobalSetting("statusToast", v)}
+                    aria-label="Enable status toast"
                   />
                 </label>
                 <label class="flex items-center justify-between">
@@ -170,6 +176,7 @@ export function SettingsModal(props: { onClose: () => void }) {
                   <Switch
                     checked={appStore.globalSettings.notifications}
                     onChange={(v) => setGlobalSetting("notifications", v)}
+                    aria-label="Enable notifications"
                   />
                 </label>
               </div>
@@ -179,7 +186,7 @@ export function SettingsModal(props: { onClose: () => void }) {
               <label class="mb-2 block text-sm font-medium text-text">ElevenLabs API Key</label>
               <Input type="text" value={key()} onChange={setKey} placeholder="sk_..." />
               <p class="mt-2 text-xs text-muted">Stored locally on device. Never shared.</p>
-              <Button onClick={saveKey} class="mt-3 w-full">
+              <Button onClick={saveKey} class="mt-3 w-full" aria-label="Save ElevenLabs key">
                 Save key
               </Button>
             </div>
@@ -193,7 +200,7 @@ export function SettingsModal(props: { onClose: () => void }) {
                   {(tab) => (
                     <label class="flex items-center justify-between rounded-xl bg-surface p-3">
                       <span class="text-sm font-medium text-text">{tab.label}</span>
-                      <Switch checked={tab.visible} onChange={() => toggleTab(tab)} />
+                      <Switch checked={tab.visible} onChange={() => toggleTab(tab)} aria-label={`Show ${tab.label} tab`} />
                     </label>
                   )}
                 </For>
@@ -212,6 +219,7 @@ export function SettingsModal(props: { onClose: () => void }) {
                   showStatus("Logo reset to default", "success");
                 }}
                 class="mt-3 w-full"
+                aria-label="Reset logo to default"
               >
                 Use default logo
               </Button>
@@ -234,7 +242,7 @@ export function SettingsModal(props: { onClose: () => void }) {
                       props.onClose();
                       showStatus(`Open ${tab.label} settings later`, "info");
                     }}
-                    class="rounded-xl bg-surface-2 px-3 py-2 text-left text-sm font-medium text-text transition hover:bg-surface-3"
+                    class="rounded-xl bg-surface-2 px-3 py-2 text-left text-sm font-medium text-text transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:bg-surface-3"
                   >
                     {tab.label}
                   </button>
@@ -248,7 +256,7 @@ export function SettingsModal(props: { onClose: () => void }) {
               <h3 class="mb-3 font-semibold text-text">Devin API</h3>
               <label class="mb-4 flex items-center justify-between">
                 <span class="text-sm text-text">Use Cloudflare Worker proxy</span>
-                <Switch checked={devinProxy()} onChange={setDevinProxy} />
+                <Switch checked={devinProxy()} onChange={setDevinProxy} aria-label="Use Cloudflare Worker proxy" />
               </label>
               <Input
                 value={devinOrg()}
@@ -274,15 +282,15 @@ export function SettingsModal(props: { onClose: () => void }) {
               <h3 class="mb-3 font-semibold text-text">Notifications</h3>
               <label class="mb-3 flex items-center justify-between">
                 <span class="text-sm text-text">When completed</span>
-                <Switch checked={devinNotifyDone()} onChange={setDevinNotifyDone} />
+                <Switch checked={devinNotifyDone()} onChange={setDevinNotifyDone} aria-label="Notify when Devin session completes" />
               </label>
               <label class="flex items-center justify-between">
                 <span class="text-sm text-text">When waiting for input</span>
-                <Switch checked={devinNotifyWait()} onChange={setDevinNotifyWait} />
+                <Switch checked={devinNotifyWait()} onChange={setDevinNotifyWait} aria-label="Notify when Devin is waiting for input" />
               </label>
             </div>
 
-            <Button onClick={saveDevin} class="w-full">
+            <Button onClick={saveDevin} class="w-full" aria-label="Save Devin settings">
               Save Devin settings
             </Button>
           </Show>

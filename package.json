@@ -1,9 +1,9 @@
 {
-  "name": "newkub-mobile",
-  "version": "0.1.0",
+  "name": "@wrikka/mobile",
+  "version": "0.0.1",
   "private": true,
   "type": "module",
-  "description": "Personal customizable app — Clock, Tasks, Devin, Notes, Saved, Email tabs on Cloudflare Workers + Android (Capacitor 8)",
+  "description": "Wrikka mobile app — Clock, Tasks, Devin, Notes, Saved, Email tabs on Cloudflare Workers + Android (Capacitor 8)",
   "scripts": {
     "dev": "vite",
     "dev:worker": "wrangler dev",
@@ -39,8 +39,7 @@
     "@cloudflare/workers-types": "^5.20260828.1",
     "@iconify-json/mdi": "^1.2.3",
     "happy-dom": "^20.12.0",
-    "jsdom": "^30.0.1",
-    "typescript": "^5.9.3",
+    "typescript": "^7.0.2",
     "unocss": "^66.8.1",
     "vite": "^8.2.2",
     "vite-plugin-solid": "^2.11.14",

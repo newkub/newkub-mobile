@@ -34,10 +34,10 @@ export function DevinQuestionCard(props: DevinQuestionCardProps) {
 
       <Show when={isApproval()}>
         <div class="mb-3 flex gap-2">
-          <Button onClick={() => quick("Approve")} size="sm" class="flex-1">
+          <Button onClick={() => quick("Approve")} size="sm" class="flex-1" aria-label="Approve">
             Approve
           </Button>
-          <Button onClick={() => quick("Decline")} variant="secondary" size="sm" class="flex-1">
+          <Button onClick={() => quick("Decline")} variant="secondary" size="sm" class="flex-1" aria-label="Decline">
             Decline
           </Button>
         </div>
@@ -50,7 +50,7 @@ export function DevinQuestionCard(props: DevinQuestionCardProps) {
           placeholder={isApproval() ? "Add a note (optional)" : "Type your answer..."}
           class="flex-1"
         />
-        <Button onClick={send} size="sm" class="shrink-0">
+        <Button onClick={send} size="sm" class="shrink-0" aria-label="Send answer">
           <span class="i-mdi-send h-4 w-4" />
         </Button>
       </div>

@@ -2,7 +2,7 @@ export interface PushEnv {
   GH_TOKEN?: string;
 }
 
-const REPO = "newkub/newkub-mobile";
+const REPO = "wrikka/wrikka-mobile";
 const FILE = "ops/push-log.txt";
 
 interface GitHubFile { content: string; sha: string; }
@@ -37,7 +37,7 @@ function decodeBase64(str: string): string {
 
 async function getCurrentFile(token: string): Promise<{ content: string; sha: string; blobSha: string; } | null> {
   const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE}?ref=main`, {
-    headers: { Accept: "application/vnd.github+json", Authorization: `Bearer ${token}`, "User-Agent": "newkub-mobile" },
+    headers: { Accept: "application/vnd.github+json", Authorization: `Bearer ${token}`, "User-Agent": "wrikka-mobile" },
   });
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`GitHub status ${res.status}`);
@@ -48,7 +48,7 @@ async function getCurrentFile(token: string): Promise<{ content: string; sha: st
 async function createBlob(token: string, content: string): Promise<string> {
   const res = await fetch(`https://api.github.com/repos/${REPO}/git/blobs`, {
     method: "POST",
-    headers: { Accept: "application/vnd.github+json", Authorization: `Bearer ${token}`, "User-Agent": "newkub-mobile" },
+    headers: { Accept: "application/vnd.github+json", Authorization: `Bearer ${token}`, "User-Agent": "wrikka-mobile" },
     body: JSON.stringify({ content, encoding: "utf-8" }),
   });
   const data = await j<GitHubBlob>(res);
@@ -57,7 +57,7 @@ async function createBlob(token: string, content: string): Promise<string> {
 
 async function getHeadSha(token: string): Promise<string> {
   const res = await fetch(`https://api.github.com/repos/${REPO}/git/ref/heads/main`, {
-    headers: { Accept: "application/vnd.github+json", Authorization: `Bearer ${token}`, "User-Agent": "newkub-mobile" },
+    headers: { Accept: "application/vnd.github+json", Authorization: `Bearer ${token}`, "User-Agent": "wrikka-mobile" },
   });
   if (!res.ok) throw new Error(`GitHub status ${res.status}`);
   const data = await j<GitHubRef>(res);
@@ -66,7 +66,7 @@ async function getHeadSha(token: string): Promise<string> {
 
 async function getTreeSha(token: string, commitSha: string): Promise<string> {
   const res = await fetch(`https://api.github.com/repos/${REPO}/git/commits/${commitSha}`, {
-    headers: { Accept: "application/vnd.github+json", Authorization: `Bearer ${token}`, "User-Agent": "newkub-mobile" },
+    headers: { Accept: "application/vnd.github+json", Authorization: `Bearer ${token}`, "User-Agent": "wrikka-mobile" },
   });
   const data = await j<GitHubCommit>(res);
   return data.tree.sha;
@@ -75,7 +75,7 @@ async function getTreeSha(token: string, commitSha: string): Promise<string> {
 async function createTree(token: string, baseTreeSha: string, path: string, blobSha: string): Promise<string> {
   const res = await fetch(`https://api.github.com/repos/${REPO}/git/trees`, {
     method: "POST",
-    headers: { Accept: "application/vnd.github+json", Authorization: `Bearer ${token}`, "User-Agent": "newkub-mobile" },
+    headers: { Accept: "application/vnd.github+json", Authorization: `Bearer ${token}`, "User-Agent": "wrikka-mobile" },
     body: JSON.stringify({
       base_tree: baseTreeSha,
       tree: [{ path, mode: "100644", type: "blob", sha: blobSha }],
@@ -88,7 +88,7 @@ async function createTree(token: string, baseTreeSha: string, path: string, blob
 async function createCommit(token: string, message: string, treeSha: string, parentSha: string): Promise<string> {
   const res = await fetch(`https://api.github.com/repos/${REPO}/git/commits`, {
     method: "POST",
-    headers: { Accept: "application/vnd.github+json", Authorization: `Bearer ${token}`, "User-Agent": "newkub-mobile" },
+    headers: { Accept: "application/vnd.github+json", Authorization: `Bearer ${token}`, "User-Agent": "wrikka-mobile" },
     body: JSON.stringify({ message, tree: treeSha, parents: [parentSha] }),
   });
   const data = await j<GitHubCreatedCommit>(res);
@@ -98,7 +98,7 @@ async function createCommit(token: string, message: string, treeSha: string, par
 async function updateRef(token: string, commitSha: string): Promise<void> {
   const res = await fetch(`https://api.github.com/repos/${REPO}/git/ref/heads/main`, {
     method: "PATCH",
-    headers: { Accept: "application/vnd.github+json", Authorization: `Bearer ${token}`, "User-Agent": "newkub-mobile" },
+    headers: { Accept: "application/vnd.github+json", Authorization: `Bearer ${token}`, "User-Agent": "wrikka-mobile" },
     body: JSON.stringify({ sha: commitSha }),
   });
   if (!res.ok) throw new Error(`GitHub update ref status ${res.status}`);

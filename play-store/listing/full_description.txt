@@ -1,4 +1,4 @@
-Newkub Mobile is a personal customizable app for Android and PWA. It starts with a clean Home screen and gives you tabs for Clock, Task, Devin, Notes, Saved, Email, and AI-generated tabs.
+Wrikka Mobile is a personal customizable app for Android and PWA. It starts with a clean Home screen and gives you tabs for Clock, Task, Devin, Notes, Saved, Email, and AI-generated tabs.
 
 Clock sub-features:
 - Alarm: set recurring alarms, choose from built-in sounds or generate a custom AI voice with ElevenLabs.
@@ -22,4 +22,4 @@ Key features:
 - Onboarding and notification setup.
 - Works offline, syncs when online.
 
-Privacy policy: https://newkub-mobile.pages.dev/privacy-policy.html
+Privacy policy: https://wrikka-mobile.pages.dev/privacy-policy.html

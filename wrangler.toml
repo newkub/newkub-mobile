@@ -1,4 +1,4 @@
-name = "newkub-mobile"
+name = "wrikka-mobile"
 compatibility_date = "2026-08-25"
 main = "worker/index.ts"
 
@@ -8,7 +8,7 @@ binding = "ASSETS"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "newkub-mobile-db"
+database_name = "wrikka-mobile-db"
 database_id = "655f4ef9-3447-49f7-96fe-64c561b712b5"
 
 # Secrets: set with `wrangler secret put <NAME>`

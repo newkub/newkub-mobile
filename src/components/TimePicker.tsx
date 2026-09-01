@@ -14,14 +14,16 @@ export function TimePicker(props: PickerProps) {
       <div class="flex flex-col items-center gap-2">
         <button
           onClick={() => props.onChange((props.hour + 1) % 24, props.minute)}
-          class="rounded-xl bg-surface-3 p-3 text-text-secondary hover:text-text"
+          class="rounded-xl bg-surface-3 p-3 text-text-secondary transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:text-text"
+          aria-label="Increase hour"
         >
           ▲
         </button>
         <div class="text-6xl font-bold tabular-nums text-glow">{pad(props.hour)}</div>
         <button
           onClick={() => props.onChange((props.hour + 23) % 24, props.minute)}
-          class="rounded-xl bg-surface-3 p-3 text-text-secondary hover:text-text"
+          class="rounded-xl bg-surface-3 p-3 text-text-secondary transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:text-text"
+          aria-label="Decrease hour"
         >
           ▼
         </button>
@@ -30,14 +32,16 @@ export function TimePicker(props: PickerProps) {
       <div class="flex flex-col items-center gap-2">
         <button
           onClick={() => props.onChange(props.hour, (props.minute + 1) % 60)}
-          class="rounded-xl bg-surface-3 p-3 text-text-secondary hover:text-text"
+          class="rounded-xl bg-surface-3 p-3 text-text-secondary transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:text-text"
+          aria-label="Increase minute"
         >
           ▲
         </button>
         <div class="text-6xl font-bold tabular-nums text-glow">{pad(props.minute)}</div>
         <button
           onClick={() => props.onChange(props.hour, (props.minute + 59) % 60)}
-          class="rounded-xl bg-surface-3 p-3 text-text-secondary hover:text-text"
+          class="rounded-xl bg-surface-3 p-3 text-text-secondary transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:text-text"
+          aria-label="Decrease minute"
         >
           ▼
         </button>

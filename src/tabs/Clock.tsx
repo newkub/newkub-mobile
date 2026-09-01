@@ -34,7 +34,7 @@ export function ClockTab() {
             return (
               <button
                 onClick={() => { haptic("light"); setClockSubTab(id); }}
-                class={`rounded-xl px-3 py-1.5 text-xs font-medium capitalize transition ${
+                class={`rounded-xl px-3 py-1.5 text-xs font-medium capitalize transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 ${
                   active() ? "bg-primary text-white" : "text-text-secondary hover:text-text"
                 }`}
               >

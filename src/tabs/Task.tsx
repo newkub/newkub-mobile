@@ -13,7 +13,7 @@ interface Task {
   done: boolean;
 }
 
-const TASKS_KEY = "newkub-mobile-tasks";
+const TASKS_KEY = "wrikka-mobile-tasks";
 
 export function TaskTab() {
   const [tasks, setTasks] = createSignal<Task[]>([]);
@@ -58,7 +58,7 @@ export function TaskTab() {
     <div class="flex h-full flex-col px-4">
       <div class="mb-4 flex gap-2">
         <Input value={value()} onChange={setValue} placeholder="New task..." class="flex-1" />
-        <Button onClick={add}>
+        <Button onClick={add} aria-label="Add task">
           <span class="i-mdi-plus h-5 w-5" />
         </Button>
       </div>
@@ -72,9 +72,9 @@ export function TaskTab() {
       </Show>
 
       <Show when={loading()}>
-        <div class="space-y-2">
+        <div class="space-y-2" aria-busy="true" aria-label="Loading tasks">
           <For each={[1, 2, 3]}>
-            {() => <div class="h-14 animate-pulse rounded-2xl bg-surface-2" />}
+            {() => <div class="skeleton h-14 w-full" aria-busy="true" aria-label="Loading" />}
           </For>
         </div>
       </Show>
@@ -83,11 +83,19 @@ export function TaskTab() {
         <For each={tasks()}>
           {(t) => (
             <div class="flex items-center gap-3 rounded-2xl bg-surface-2 p-3">
-              <button onClick={() => toggle(t.id)}>
+              <button
+                onClick={() => toggle(t.id)}
+                class="transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                aria-label={t.done ? "Mark task as not done" : "Mark task as done"}
+              >
                 <span class={`h-5 w-5 ${t.done ? "i-mdi-check-circle text-primary" : "i-mdi-circle text-text-secondary"}`} />
               </button>
               <span class={`flex-1 text-sm ${t.done ? "text-muted line-through" : "text-text"}`}>{t.title}</span>
-              <button onClick={() => remove(t.id)} class="text-text-secondary hover:text-rose-400">
+              <button
+                onClick={() => remove(t.id)}
+                class="text-text-secondary transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:text-rose-400"
+                aria-label="Delete task"
+              >
                 <span class="i-mdi-delete h-4 w-4" />
               </button>
             </div>

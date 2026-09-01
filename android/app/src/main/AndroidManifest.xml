@@ -36,7 +36,7 @@
         <receiver
             android:name=".widget.ClockWidget"
             android:exported="true"
-            android:label="Newkub Mobile">
+            android:label="Wrikka Mobile">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>

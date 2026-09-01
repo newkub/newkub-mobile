@@ -8,6 +8,7 @@ type BtnProps = {
   class?: string;
   disabled?: boolean;
   type?: "button" | "submit";
+  "aria-label"?: string;
 };
 
 export function Button(props: BtnProps) {
@@ -15,7 +16,7 @@ export function Button(props: BtnProps) {
   const size = props.size ?? "md";
 
   const base =
-    "inline-flex items-center justify-center font-semibold rounded-2xl transition active:scale-95 disabled:opacity-40 disabled:active:scale-100";
+    "inline-flex items-center justify-center font-semibold rounded-2xl transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-40 disabled:active:scale-100";
   const variants = {
     primary: "bg-primary text-white hover:bg-primary-glow",
     secondary: "bg-surface-2 text-text hover:bg-surface-3 border border-border",
@@ -34,6 +35,7 @@ export function Button(props: BtnProps) {
       disabled={props.disabled}
       onClick={props.onClick}
       class={`${base} ${variants[variant]} ${sizes[size]} ${props.class ?? ""}`}
+      aria-label={props["aria-label"]}
     >
       {props.children}
     </button>

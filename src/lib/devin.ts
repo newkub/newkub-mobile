@@ -238,6 +238,19 @@ export async function pollDevinSession(
 
 export { DevinSettings };
 
+export async function requestAiFix(input: { query: string; codeSnippet?: string }): Promise<string> {
+  const res = await fetch("/api/ai-fix", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ error: input.query, code: input.codeSnippet }),
+  });
+  const json = (await res.json()) as { suggestion?: string; ok?: boolean; error?: string };
+  if (!res.ok || !json.ok) {
+    throw new DevinError(json.error || `HTTP ${res.status}`, res.status);
+  }
+  return json.suggestion || "No suggestion returned";
+}
+
 let lastNotifiedStatus = "";
 let lastNotifiedDetail = "";
 

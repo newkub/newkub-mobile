@@ -68,7 +68,8 @@ export function DevinMessageBubble(props: { message: DevinMessage }) {
                 href={a.url}
                 target="_blank"
                 rel="noreferrer"
-                class="block truncate text-xs underline opacity-80"
+                class="block truncate text-xs underline opacity-80 transition hover:opacity-100"
+                aria-label={`Open attachment ${a.url}`}
               >
                 {a.url}
               </a>
@@ -81,7 +82,7 @@ export function DevinMessageBubble(props: { message: DevinMessage }) {
             <button
               onClick={speak}
               disabled={loadingTts()}
-              class={`text-xs transition hover:text-primary ${playing() ? "text-primary" : "opacity-70"}`}
+              class={`text-xs transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:text-primary ${playing() ? "text-primary" : "opacity-70"}`}
               aria-label={playing() ? "Stop speaking" : "Speak message"}
             >
               {loadingTts() ? (

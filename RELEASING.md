@@ -1,4 +1,4 @@
-# Releasing newkub-mobile
+# Releasing wrikka-mobile
 
 ## Local Build
 
@@ -25,10 +25,10 @@ For Play Store, use the upload keystore. Google Play will manage the final app s
 ### Manual
 
 1. Open https://play.google.com/console
-2. Create app with package name `com.newkub.newkubmobile`
+2. Create app with package name `com.wrikka.wrikkamobile`
 3. Go to `Release > Production > Create new release`
 4. Upload `app-release.aab`
-5. Add release notes, set privacy policy to `https://newkub-mobile.workers.dev/privacy-policy.html`
+5. Add release notes, set privacy policy to `https://wrikka-mobile.workers.dev/privacy-policy.html`
 6. Complete app listing and content rating
 7. Review and publish
 
@@ -41,7 +41,7 @@ For Play Store, use the upload keystore. Google Play will manage the final app s
    - Click `Create service account` and follow the steps
    - Grant the service account `Release Manager` role
    - Download the JSON key
-2. Add GitHub secrets in `newkub/newkub-mobile`:
+2. Add GitHub secrets in `wrikka/wrikka-mobile`:
    - `PLAY_STORE_SERVICE_ACCOUNT_JSON` — paste the full JSON key
    - `SIGNING_KEYSTORE_BASE64` — base64 of `newkub-mobile-upload.keystore`
    - `SIGNING_STORE_PASSWORD`

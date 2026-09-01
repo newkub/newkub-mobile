@@ -105,20 +105,20 @@ export function HomeTab() {
             <div class="mb-4 rounded-3xl bg-surface-2 p-6">
               <span class="i-mdi-view-grid h-12 w-12 text-primary" />
             </div>
-            <p class="text-2xl font-bold text-text">Welcome to Newkub Mobile</p>
+            <p class="text-2xl font-bold text-text">Welcome to Wrikka Mobile</p>
             <p class="mb-4 text-center text-sm text-text-secondary">Start with an empty home or use default widgets</p>
 
             <div class="mb-4 flex gap-3">
               <button
                 onClick={useDefaults}
-                class="flex items-center gap-2 rounded-full bg-primary px-5 py-3 font-medium text-white transition active:scale-95"
+                class="flex items-center gap-2 rounded-full bg-primary px-5 py-3 font-medium text-white transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50"
               >
                 <span class="i-mdi-sparkles h-5 w-5" />
                 Use default home
               </button>
               <button
                 onClick={() => { haptic("light"); setAdding(!adding()); }}
-                class="flex items-center gap-2 rounded-full bg-surface-2 px-5 py-3 font-medium text-text transition active:scale-95"
+                class="flex items-center gap-2 rounded-full bg-surface-2 px-5 py-3 font-medium text-text transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:text-text"
               >
                 <span class="i-mdi-plus h-5 w-5" />
                 Add widget
@@ -130,7 +130,7 @@ export function HomeTab() {
                 {(tabId) => (
                   <button
                     onClick={() => openTab(tabId)}
-                    class="rounded-full bg-surface-2 px-4 py-2 text-sm font-medium capitalize text-text-secondary transition hover:text-text"
+                    class="rounded-full bg-surface-2 px-4 py-2 text-sm font-medium capitalize text-text-secondary transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:text-text"
                   >
                     Open {tabId}
                   </button>
@@ -147,7 +147,13 @@ export function HomeTab() {
                 <div class="relative rounded-2xl bg-surface-2 p-4">
                   <div class="mb-2 flex items-center justify-between">
                     <span class="text-sm font-medium capitalize text-text">{w.title}</span>
-                    <button onClick={() => remove(w.id)} class="text-xs text-text-secondary hover:text-rose-400">×</button>
+                    <button
+                      onClick={() => remove(w.id)}
+                      class="text-xs text-text-secondary transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:text-rose-400"
+                      aria-label="Remove widget"
+                    >
+                      ×
+                    </button>
                   </div>
                   <WidgetPreview type={w.type} />
                 </div>
@@ -156,7 +162,7 @@ export function HomeTab() {
           </div>
           <button
             onClick={() => { haptic("light"); setAdding(!adding()); }}
-            class="mx-auto flex items-center gap-2 rounded-full bg-surface-2 px-4 py-2 text-sm font-medium text-text-secondary transition hover:text-text"
+            class="mx-auto flex items-center gap-2 rounded-full bg-surface-2 px-4 py-2 text-sm font-medium text-text-secondary transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:text-text"
           >
             <span class="i-mdi-plus h-4 w-4" />
             Add widget
@@ -172,7 +178,7 @@ export function HomeTab() {
               {({ type, label, icon }) => (
                 <button
                   onClick={() => add(type)}
-                  class="flex flex-col items-center gap-1 rounded-xl bg-surface-2 p-3 text-xs font-medium text-text-secondary transition hover:text-text"
+                  class="flex flex-col items-center gap-1 rounded-xl bg-surface-2 p-3 text-xs font-medium text-text-secondary transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:text-text"
                 >
                   <span class={`${icon} h-5 w-5`} />
                   {label}

@@ -7,10 +7,10 @@ export interface RepoStatus {
   error: string | null;
 }
 
-export async function fetchRepoStatus(repo = "newkub/newkub-mobile"): Promise<RepoStatus> {
+export async function fetchRepoStatus(repo = "wrikka/wrikka-mobile"): Promise<RepoStatus> {
   try {
     const res = await fetch(`https://api.github.com/repos/${repo}`, {
-      headers: { Accept: "application/vnd.github+json", "User-Agent": "newkub-mobile" },
+      headers: { Accept: "application/vnd.github+json", "User-Agent": "wrikka-mobile" },
     });
     if (!res.ok) {
       return { name: repo, url: `https://github.com/${repo}`, pushedAt: null, updatedAt: null, defaultBranch: "main", error: `GitHub status ${res.status}` };

@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "com.newkub.newkubmobile",
-  appName: "Newkub Mobile",
+  appId: "com.wrikka.mobile",
+  appName: "Wrikka Mobile",
   webDir: "dist",
   server: {
     androidScheme: "https",

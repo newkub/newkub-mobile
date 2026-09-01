@@ -157,7 +157,7 @@ export function DevinChat(props: {
         <div class="flex items-center gap-2 overflow-hidden">
           <button
             onClick={props.onBack}
-            class="rounded-full p-2 text-text-secondary transition hover:text-text"
+            class="rounded-full p-2 text-text-secondary transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:text-text"
             aria-label="Back"
           >
             <span class="i-mdi-arrow-left h-5 w-5" />
@@ -174,22 +174,22 @@ export function DevinChat(props: {
         <div class="flex items-center gap-1">
           <button
             onClick={openWeb}
-            class="rounded-full p-2 text-text-secondary transition hover:text-text"
+            class="rounded-full p-2 text-text-secondary transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:text-text"
             aria-label="Open in web"
           >
             <span class="i-mdi-open-in-new h-5 w-5" />
           </button>
           <button
             onClick={archive}
-            class="rounded-full p-2 text-text-secondary transition hover:text-text"
-            aria-label="Archive"
+            class="rounded-full p-2 text-text-secondary transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:text-text"
+            aria-label="Archive session"
           >
             <span class="i-mdi-archive h-5 w-5" />
           </button>
           <button
             onClick={terminate}
-            class="rounded-full p-2 text-text-secondary transition hover:text-danger"
-            aria-label="Terminate"
+            class="rounded-full p-2 text-text-secondary transition active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary/50 hover:text-danger"
+            aria-label="Terminate session"
           >
             <span class="i-mdi-stop-circle h-5 w-5" />
           </button>
@@ -207,9 +207,9 @@ export function DevinChat(props: {
         class="flex-1 space-y-3 overflow-y-auto rounded-2xl bg-surface p-3"
       >
         <Show when={loading() && messages().length === 0}>
-          <div class="space-y-2 p-2">
+          <div class="space-y-2 p-2" aria-busy="true" aria-label="Loading messages">
             <For each={[1, 2, 3]}>
-              {() => <div class="h-16 animate-pulse rounded-2xl bg-surface-2" />}
+              {() => <div class="skeleton h-16 w-full" aria-busy="true" aria-label="Loading" />}
             </For>
           </div>
         </Show>
